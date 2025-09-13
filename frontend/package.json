@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:full": "concurrently \"npm run dev\" \"cd ../backend && npm run dev\"",
     "build": "vite build",
     "preview": "vite preview",
     "check": "tsc"
@@ -43,6 +44,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "concurrently": "^9.1.0",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.2",
