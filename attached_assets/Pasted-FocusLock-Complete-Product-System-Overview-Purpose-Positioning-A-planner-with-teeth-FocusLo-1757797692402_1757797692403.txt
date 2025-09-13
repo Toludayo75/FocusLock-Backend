@@ -1,0 +1,233 @@
+FocusLock - Complete Product & System Overview
+Purpose & Positioning
+A planner with teeth: FocusLock schedules tasks and enforces them by locking the device to only required app(s) until the user submits proof of completion.
+
+Target Users: Serious students & professionals doing online courses, internships, certifications, and deep work blocks.
+
+Architecture Overview
+Current Implementation Status
+Frontend: React + TypeScript (Port 5000)
+Backend: Express.js + TypeScript (Port 3001)
+Database: Neon PostgreSQL with Drizzle ORM
+Authentication: Passport.js with session management
+UI Framework: Tailwind CSS + shadcn/ui components
+Information Architecture
+A) Onboarding Flow (No Bottom Nav)
+Current Status: ✅ Implemented
+
+Login/Signup with email validation
+Strict Mode Agreement modal (pops up when new user registers)
+Forgot password functionality
+Flow:
+
+Login → validate → Home
+Signup → create → show Agreement → Home
+B) Bottom Navigation (After Login)
+Current Status: ✅ Implemented
+
+[ Home 🏠 ] [ Tasks ✅ ] [ Progress 📈 ] [ Calendar 📅 ] [ Settings ⚙️ ]
+C) Core Pages Implementation
+1. Home (Dashboard)
+Current Status: ✅ Implemented
+
+Today's tasks display
+Next enforced task countdown
+Quick "Start Task" functionality
+Enforcement status indicator
+Interactions:
+
+Tap task card → Task Details
+Start Task → triggers Enforcement Session
+2. Tasks Page
+Current Status: ✅ Implemented
+
+List view (Today/Upcoming/Completed)
+Add/Edit/Delete Task functionality
+Filters & categories
+Calendar integration link
+Task Model Structure:
+
+{
+  "id": "uuid",
+  "userId": "uuid", 
+  "title": "Coursera: DL Lesson 3",
+  "startAt": "2025-09-05T10:00:00Z",
+  "endAt": "2025-09-05T11:00:00Z",
+  "durationMinutes": 60,
+  "strictLevel": "HARD",
+  "targetApps": ["org.coursera.android"],
+  "allowedEssentials": ["phone","sms","contacts"],
+  "proofPolicy": {
+    "methods": ["screenshot","quiz","checkin"],
+    "quizMinScore": 70,
+    "minForegroundPct": 80
+  }
+}
+3. Calendar Page
+Current Status: ✅ Implemented
+
+Week/Month views
+Drag-to-reschedule functionality
+Task detail views
+4. Progress Page
+Current Status: ✅ Implemented
+
+User progress tracking
+Completion statistics
+Streak monitoring
+5. Settings Hub Structure
+Current Status: ✅ Implemented
+
+Settings acts as a hub page with sub-pages:
+
+Profile & Account
+
+View/edit personal info (name, email, avatar)
+Change password
+Manage connected devices
+Notifications
+
+Toggle reminders (on/off)
+Choose notification types
+Set reminder times
+Focus & Restrictions
+
+Strict Mode Toggle with confirmation modal
+Uninstall Protection with 24h cooldown
+Shows remaining cooldown timer
+Integrations
+
+Connect learning platforms (Coursera, Udemy, EdX)
+Calendar sync (Google, Outlook)
+Accountability & Penalties
+
+Add accountability partners
+Penalty settings
+Logout
+
+Confirmation modal: "Are you sure you want to log out?"
+Task Enforcement System
+Enforcement Session State
+{
+  "sessionId": "uuid",
+  "taskId": "uuid", 
+  "status": "LOCKED",
+  "whitelist": ["org.coursera.android", "com.android.dialer"],
+  "startedAt": "...",
+  "foregroundLog": [{"package": "org.coursera.android", "ms": 2400000}]
+}
+Enforcement Flow
+At Task Time: Local scheduler triggers
+Build Whitelist: targetApps + essentials + FocusLock
+Enter Focus Mode: Device restrictions activated
+Track Usage: Foreground app monitoring
+End Session: Transition to proof submission
+Validate Proof: Multiple proof methods
+Unlock Device: On successful validation
+Strict Levels
+SOFT: Log deviations, nudge only
+MEDIUM: 10-second grace period, then block
+HARD: Immediate block with toast notifications
+Proof Submission System
+H) Proof Types (🔒 Enforced Mode)
+Current Status: ✅ Implemented
+
+Split into separate proof types:
+
+Screenshot Proof - Upload/AI verification
+Quiz Proof - MCQs with minimum score requirement
+Check-in Proof - Text/voice journal entries
+Usage Log Proof - Auto-tracked app usage
+Validation Logic
+function evaluateProof(sessionId, payload) {
+  const usage = usageService.foregroundPct(sessionId, task.targetApps);
+  if (usage < task.proofPolicy.minForegroundPct) return deny("Insufficient focus time");
+  let ok = false;
+  switch(payload.type) {
+    case "screenshot": ok = screenshotAI.validate(payload.file, task); break;
+    case "quiz": ok = payload.score >= task.proofPolicy.quizMinScore; break;
+    case "checkin": ok = nlp.topicality(payload.text, task.title) >= 0.65; break;
+  }
+  
+  if (!ok) return deny("Proof not valid");
+  return approve();
+}
+Backend API Structure
+Core Services
+Task Service: CRUD operations, scheduling, conflicts
+Enforcement Service: Policy manifests, session management
+Proof Service: Validation, verification logic
+Usage Service: Foreground tracking, analytics
+Auth Service: JWT/session management
+Notification Service: FCM/APNS push notifications
+API Endpoints (Current Implementation)
+Auth:
+POST /api/login, /api/register, /api/logout
+GET  /api/user
+Tasks:
+GET    /api/tasks?range=today|week
+POST   /api/tasks
+PATCH  /api/tasks/:id
+DELETE /api/tasks/:id
+Enforcement:
+POST  /api/enforcement/sessions
+PATCH /api/enforcement/sessions/:id/status
+POST  /api/enforcement/sessions/:id/usage
+Proof:
+POST /api/proof/:sessionId/screenshot
+POST /api/proof/:sessionId/quiz  
+POST /api/proof/:sessionId/checkin
+POST /api/proof/:sessionId/decision
+Data Model
+Core Tables
+users: id, email, name, auth_provider, created_at
+devices: id, user_id, platform, device_token, device_owner_enabled
+tasks: id, user_id, title, start_at, end_at, strict_level, proof_policy
+task_target_apps: id, task_id, platform, package_or_bundle
+sessions: id, task_id, device_id, status, started_at, ended_at
+session_usage_logs: id, session_id, package, ms_in_foreground
+proofs: id, session_id, method, result, score, file_url
+accountability_partners: id, user_id, partner_user_id, status
+UX Micro-Behaviors
+Confirmation Modals
+Logout: "Are you sure you want to log out?" Yes/No
+Strict Mode OFF: "Turning this off removes restrictions." Confirm/Cancel
+Uninstall Protection: Modal with cooldown disclosure
+Delete Task: "Delete this task permanently?" Yes/No
+Drag-reschedule: "Move to Tue 10:00?" Yes/No
+Invalid Proof: Toast with specific error message
+Mobile Enforcement (Future Implementation)
+Android (Preferred)
+Device Owner + Lock Task Mode via DevicePolicyManager
+App whitelist with setLockTaskPackages
+UsageStatsManager for tracking
+Uninstall protection with 24h server-side cooldown
+iOS (Limited)
+FamilyControls/Screen Time API (iOS 16+)
+App Intents/URL schemes for launching
+Activity tokens for usage tracking
+Friction-based uninstall protection
+Security & Privacy
+All data encrypted in transit (TLS) and at rest
+Short TTL for proof screenshots (PII protection)
+Local-only verification option available
+Audit logs for policy changes
+Rate limiting on sensitive endpoints
+Device attestation for rooted/jailbroken detection
+Rollout Plan
+MVP (Current Phase) ✅
+Task management with calendar integration
+Web-based enforcement simulation
+Screenshot/Quiz/Check-in proof methods
+Basic progress tracking
+Settings with sub-pages
+Phase 2 (Next)
+Real mobile enforcement (Android first)
+iOS Screen Time integration
+Advanced analytics
+Accountability system
+Phase 3 (Future)
+Course platform integrations
+On-device AI for proof validation
+Advanced penalty systems
+Multi-device synchronization

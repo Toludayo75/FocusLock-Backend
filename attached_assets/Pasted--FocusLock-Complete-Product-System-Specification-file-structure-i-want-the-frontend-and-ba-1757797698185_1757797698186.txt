@@ -1,0 +1,515 @@
+
+FocusLock — Complete Product & System Specification
+
+file structure 
+i want the frontend and backend seprately not together
+
+Purpose & Positioning
+
+A planner with teeth: schedules tasks and enforces them by locking the device to only the required app(s) until the user submits **proof of completion**.
+
+Primary users: serious students & professionals doing online courses, internships, certifications, deep work blocks.
+
+
+Information Architecture (Pages, Bottom Nav, Interactions)
+
+A) Onboarding (no bottom nav)
+
+Login/Signup (email).
+Strict Mode Agreement modal (must accept)(let it pop up wen new user click the reqister button ).
+Forgot password.
+
+Interactions
+Login → validate → Home.
+Signup → create → show Agreement → Home.
+
+B) Bottom Navigation (after login)
+
+`[ Home 🏠 ] [ Tasks ✅ ] [ Progress 📈 ] [ Calendar 📅 ] [ Settings ⚙️ ]`
+
+If 5 tabs feel crowded, merge Calendar into Tasks to have 4 tabs.
+
+C) Home (Dashboard)
+
+-Today’s tasks, next enforced task countdown.
+-Quick “Start Task”.
+-Enforcement status (“Locked to Coursera until proof submitted”).
+
+Interactions
+
+Tap task card → Task Details showing (time, duration, target apps, strict level).
+Start Task → triggers Enforcement Session.
+
+D) Tasks
+
+-List (Today/Upcoming/Completed).
+-Add/Edit/Delete Task.
+-Filters & categories.
+-Link to Calendar.
+
+Interactions
+
+Add Task → form (time, duration, target apps, strict level).
+Edit/Delete → confirm dialogs.
+Calendar icon → Calendar Page.
+
+E) Calendar
+
+Week/Month views, drag-reschedule.
+Tapping a task → Task Details.
+
+Interactions
+
+Drag to new slot → “Reschedule to … Yes/No”.
+
+F) Progress
+
+-just show user progress
+
+G) Settings Page Structure
+
+The Settings will act as a hub page, with links to sub-pages.
+Each sub-page handles its own logic so the user isn’t overwhelmed on one screen.
+
+1. Profile & Account
+
+View/edit personal info (name, email, avatar).
+
+Change password.
+
+Manage connected devices.
+
+Actions:
+
+Click "Edit Profile" → go to edit form.
+
+Click "Change Password" → open password change page.
+
+2. Notifications
+
+Toggle reminders (on/off).
+
+Choose notification types (task reminders, streak updates, accountability alerts).
+
+Set reminder times (e.g., “10 min before task”).
+
+3. Focus & Restrictions
+
+Strict Mode Toggle:
+
+Switch ON/OFF → confirmation modal (“Are you sure you want to disable Strict Mode?”).
+
+Uninstall Protection:
+
+Toggle with agreement → modal (“Once enabled, uninstall requires a 24h cooldown”).
+
+Shows remaining cooldown timer if active.
+
+4. Integrations
+
+Connect/disconnect learning platforms: Coursera, Udemy, EdX.
+
+Connect calendar (Google, Outlook).
+
+Sync toggle for each service.
+
+5. Accountability & Penalties (optional/advanced users)
+
+Add accountability partner (invite via email/username).
+
+Penalty settings: e.g., notify partner if task failed, deduct streak points, block leisure apps.
+
+6. Logout
+
+Button at bottom.
+
+Tap → confirmation modal(pop up):
+
+“Are you sure you want to log out?” Yes / No
+
+settings navigation Layout
+
+Settings (hub page):
+
+List of menu items:
+
+Profile & Account → sub-page
+
+Notifications → sub-page
+
+Focus & Restrictions → sub-page
+
+Integrations → sub-page
+
+Accountability & Penalties → sub-page
+
+Logout → confirmation modal(pops-up)
+
+Each sub-page returns back to Settings hub.
+
+
+
+H) Proof Submission (🔒 Enforced Mode)
+
+Instead of one all-in-one proof page, split into:
+
+Screenshot Proof (upload/AI check).
+
+Quiz Proof (MCQs).
+
+Check-in Proof (text/voice journal).
+
+Usage Log Proof (auto-tracked app usage).
+
+This way, user only sees the relevant proof type per task.
+
+
+BELOW IS EXAMPLE OF LOGIC 
+
+ 4) Task Enforcement Logic (Mobile-first)
+
+ A) Task Model (core fields)
+
+```json
+{
+  "id": "uuid",
+  "userId": "uuid",
+  "title": "Coursera: DL Lesson 3",
+  "startAt": "2025-09-05T10:00:00Z",
+  "endAt": "2025-09-05T11:00:00Z",
+  "durationMinutes": 60,
+  "strictLevel": "HARD",        // SOFT | MEDIUM | HARD
+  "targetApps": [
+    {"platform":"android","package":"org.coursera.android"},
+    {"platform":"ios","bundleId":"org.coursera.ios"}
+  ],
+  "allowedEssentials": ["phone","sms","contacts","calendar","camera"],
+  "proofPolicy": {
+    "methods": ["screenshot","quiz","checkin"],
+    "quizMinScore": 70,
+    "minForegroundPct": 80
+  }
+}
+```
+
+B) Enforcement Session State (device)
+
+```json
+{
+  "sessionId":"uuid",
+  "taskId":"uuid",
+  "status":"LOCKED",     // PENDING -> LOCKED -> PROOF_REQUIRED -> UNLOCKED|FAILED
+  "whitelist":[ "org.coursera.android", "com.android.dialer", ... ],
+  "startedAt": "...",
+  "foregroundLog":[{"package":"org.coursera.android","ms":2400000}, ...]
+}
+```
+
+ C) At Task Time (flow)
+
+1. Local scheduler/alarm wakes app.
+2. Build **dynamic whitelist**:
+
+   * `whitelist = targetApps + essentials + StrictPlanner`
+3. Enter **Focus/Kiosk mode**:
+
+   * **Android**: Device Owner + Lock Task Mode; enforce whitelist; auto-launch target app via Intent.
+   * **iOS**: Screen Time/FamilyControls to allowlisted apps only; open target app via URL scheme/App Intents.
+4. Start **foreground tracking** (UsageStats / Activity tokens).
+5. Block switches to non-allowed apps (overlay/return-to-task).
+
+ D) During Session
+
+* If user attempts exit:
+
+  * **HARD**: immediate block + toast “Return to task”.
+  * **MEDIUM**: 10-second grace; then block.
+  * **SOFT**: log deviation, nudge only.
+
+### E) End of Duration
+
+* Transition to **PROOF\_REQUIRED** (device remains restricted).
+* Display **Proof Submission** screen.
+
+F) Exit Conditions
+
+* **Valid proof + usage threshold met** → **UNLOCKED** → disable Focus/Kiosk → Home.
+* **Invalid proof** → stay in PROOF\_REQUIRED.
+* **User aborts**:
+
+  * If Uninstall Protection active: start **cooldown** (e.g., 24h), keep device in **reduced** restriction or log hard failure; notify accountability contact.
+
+---
+
+5) Proof Submission Logic
+
+ A) Methods
+
+1. **Screenshot**
+
+   * Client checks the image: correct app window, key UI tokens (e.g., “Completed”, progress bar ≥ X%).
+   * On-device fast check; server re-checks for fraud (optional).
+2. **Mini-Quiz**
+
+   * 2–5 MCQs (from course metadata if integrated, or user-authored prompts).
+   * Must score ≥ `quizMinScore`.
+3. **Check-in (Text/Voice)**
+
+   * 2–3 bullet takeaways; optional speech-to-text.
+   * Server runs quick topicality checks (lightweight semantic similarity to the task title/description).
+
+ B) Validation rules (combined)
+
+* `foregroundUsagePct(task) >= minForegroundPct`
+* `proof.method in allowed`
+* `screenshotValid || quizScoreOk || checkinOk`
+* **Anti-cheat**: EXIF sanity, duplicate screenshot hash, time delta from endAt, device time tamper signals.
+
+ C) Decision
+
+* If **all pass** → unlock.
+* If **any fail** → show actionable error and keep in Proof Required.
+
+---
+
+6) Backend Design (APIs & Services)
+
+ A) Key Services
+
+* **Task Service**: CRUD tasks, compute schedules, conflict checks.
+* **Enforcement Service**: issues **policy manifests** to the device for each session (whitelist, timers, rules).
+* **Proof Service**: receives artifacts, runs verification, returns decision.
+* **Usage Service**: receives foreground logs, computes % time in target apps.
+* **Accountability Service**: notifies partners on fail/abort.
+* **Auth/Identity**: JWT/OAuth, device binding.
+* **Notification Service**: FCM/APNS/web push reminders & transitions.
+
+ B) Example REST (or GraphQL) Endpoints
+
+**Auth**
+
+* `POST /auth/signup`
+* `POST /auth/login`
+* `POST /auth/forgot-password`
+
+**Tasks**
+
+* `GET /tasks?range=today|week`
+* `POST /tasks` *(validates targetApps exist on user device)*
+* `PATCH /tasks/:id`
+* `DELETE /tasks/:id`
+
+**Enforcement**
+
+* `POST /enforcement/sessions` *(client asks for a policy at startAt)*
+* `PATCH /enforcement/sessions/:id/status` *(client -> server: PENDING/LOCKED/PROOF\_REQUIRED/UNLOCKED/FAILED)*
+* `POST /enforcement/sessions/:id/usage` *(foreground log batch)*
+
+**Proof**
+
+* `POST /proof/:sessionId/screenshot` *(multipart, returns {valid\:boolean, reasons:\[]})*
+* `POST /proof/:sessionId/quiz` *(answers\[])*
+* `POST /proof/:sessionId/checkin` *(text or audio)*
+* `POST /proof/:sessionId/decision` *(server finalizes & responds with unlock=true/false)*
+
+**Accountability**
+
+* `POST /accountability/partners` *(invite/accept)*
+* `POST /accountability/events` *(server sends notifications on fail/abort)*
+
+**Integrations**
+
+* `POST /integrations/calendar/sync`
+* `POST /integrations/platforms/connect` *(Coursera/Udemy if available)*
+
+ C) Server Decision Pseudocode
+
+```ts
+function evaluateProof(sessionId, payload) {
+  const session = db.sessions.get(sessionId);
+  const task = db.tasks.get(session.taskId);
+
+  const usage = usageService.foregroundPct(sessionId, task.targetApps);
+  if (usage < task.proofPolicy.minForegroundPct) return deny("Insufficient focus time");
+
+  let ok = false;
+  switch(payload.type) {
+    case "screenshot": ok = screenshotAI.validate(payload.file, task); break;
+    case "quiz": ok = payload.score >= task.proofPolicy.quizMinScore; break;
+    case "checkin": ok = nlp.topicality(payload.text, task.title) >= 0.65; break;
+  }
+  if (!ok) return deny("Proof not valid");
+
+  db.sessions.update(sessionId, { status: "UNLOCKED", unlockedAt: now() });
+  push.toDevice(session.deviceId, { action: "UNLOCK_DEVICE" });
+  return approve();
+}
+```
+
+---
+ignore No7 this for now this is for mobile conversion so just know this so it can be easier wen i want to convert to mobile app
+7) Mobile OS Enforcement (Deep Dive)
+
+A) Android (preferred for strongest control)
+
+* **Device Owner / Lock Task (Kiosk) Mode** via `DevicePolicyManager`.
+* **App Whitelist** with `setLockTaskPackages`.
+* **Block status bar & recent apps** in HARD mode.
+* **UsageStatsManager** logs foreground package time.
+* **Uninstall Protection**: app is device owner → must deactivate (we enforce 24h cooldown on server; client shows countdown & remains in reduced-restriction).
+
+B) iOS (more constrained)
+ **FamilyControls / Screen Time API** (iOS 16+): configure `ShieldApplicationCategory` + allowlist.
+* Launch target via **App Intents / URL schemes**.
+* Foreground usage via **Activity tokens** + Screen Time reports.
+* **Uninstall** can’t be technically blocked; mitigation:
+
+  * Strong friction (cooldown server-side, loss of streak, partner notification).
+  * Re-enrollment flow to resume strict use.
+
+---
+
+8) Data Model (simplified)
+
+users**
+
+ id, email, name, auth\_provider, created\_at
+
+devices**
+
+ id, user\_id, platform, device\_token, device\_owner\_enabled, last\_seen
+
+tasks**
+
+ id, user\_id, title, start\_at, end\_at, strict\_level, proof\_policy (JSONB)
+task\_target\_apps**
+
+ id, task\_id, platform, package\_or\_bundle
+
+sessions**
+
+ id, task\_id, device\_id, status, started\_at, ended\_at, unlocked\_at
+
+session\_usage\_logs**
+
+ id, session\_id, package, ms\_in\_foreground, timestamp
+
+proofs**
+
+ id, session\_id, method, result, score, file\_url, created\_at
+
+accountability\_partners**
+
+ id, user\_id, partner\_user\_id, status
+
+---
+
+9) Security, Privacy & Compliance
+
+All data encrypted in transit (TLS) and at rest (KMS).
+Proof screenshots may contain PII — store with short TTL or explicit user consent.
+Allow **local-only** verification option (privacy mode) with on-device ML, storing only hashes/metrics.
+Audit logs for policy changes, uninstall requests, failures.
+Rate limit sensitive endpoints; device attestation for rooted/jailbroken detection (flag reduced trust).
+
+---
+
+10) Notifications & Scheduling
+
+Server schedules reminders (T-10min, T-0).
+Device must maintain **local alarms** (works offline) and reconcile with server when online.
+State reconciliation on reconnect (idempotent session transitions).
+
+---
+
+11) Edge Cases & Fallbacks
+
+No target app installed: prompt to install before enabling strict mode.
+No network at proof time: allow on-device validation; queue server sync.
+Phone call during session: essentials allowed; log gap; don’t fail if < configured threshold.
+User time tampering: compare with server time; if drift > threshold, mark session “suspect”.
+
+---
+
+## 12) Rollout Plan
+
+* **MVP (Android-first)**: Tasks, Enforcement (HARD), Screenshot proof, Usage logging, Basic Progress, Uninstall protection (cooldown).
+* **Phase 2**: iOS Screen Time enforcement, Mini-Quiz, Calendar, Advanced Progress.
+* **Phase 3**: Accountability, Penalties, Course integrations, On-device AI upgrades.
+
+---
+
+13) Developer Contracts (what frontend shows vs backend expects)
+
+Create Task (client → server)
+
+```ts
+POST /tasks
+{
+  title, startAt, endAt, strictLevel,
+  targetApps: [{platform:"android", package:"org.coursera.android"}],
+  proofPolicy: { methods:["screenshot","quiz"], quizMinScore:70, minForegroundPct:80 }
+}
+```
+
+Response: saved task + normalized policy.
+
+Start Session (client → server at startAt)
+
+```ts
+POST /enforcement/sessions
+{ taskId, deviceId, deviceInfo }
+```
+
+Response: `{ sessionId, whitelist, mode:"HARD", endAt }`
+
+Submit Proof
+
+* `POST /proof/:sessionId/screenshot` (multipart)
+* `POST /proof/:sessionId/quiz` `{ answers:[...] }`
+* `POST /proof/:sessionId/checkin` `{ text:"..." }`
+
+**Decision**
+
+```ts
+POST /proof/:sessionId/decision -> { unlock: true|false, reasons?:[] }
+```
+
+### Device Unlock (server → client push)
+
+```json
+{ "action": "UNLOCK_DEVICE", "sessionId": "..." }
+```
+
+---
+
+14) UX Micro-Behaviors (examples you asked for)
+
+* **Logout (Settings)** → modal: “Are you sure you want to log out?” **Yes / No**.
+* **Toggle Strict Mode OFF** → modal: “Turning this off removes restrictions.” **Confirm / Cancel**.
+* **Activate Uninstall Protection** → modal with cooldown disclosure; **Agree / Cancel**.
+* **Delete Task** → modal: “Delete this task permanently?” **Yes / No**.
+* **Drag-reschedule** → modal: “Move to Tue 10:00?” **Yes / No**.
+* **Proof invalid** → toast: “Proof not accepted. Screenshot must show lesson completion.”
+
+---
+
+15) Quick Pseudocode (Android Lock/Whitelist)
+
+```kotlin
+fun enterLockMode(session: SessionPolicy) {
+    val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+    if (!dpm.isDeviceOwnerApp(packageName)) { /* fallback soft mode */ }
+
+    dpm.setLockTaskPackages(admin, session.whitelist.toTypedArray())
+    startLockTask() // kiosk
+    launchTargetApp(session.targetPackage)
+}
+
+fun launchTargetApp(pkg: String) {
+    val launch = packageManager.getLaunchIntentForPackage(pkg)
+    startActivity(launch?.apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
+}
+
+fun isAllowed(pkg: String, whitelist: Set<String>) = whitelist.contains(pkg)
+```
