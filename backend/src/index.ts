@@ -24,7 +24,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 });
 
 // Start server
-const port = parseInt(process.env.PORT || '8000', 10);
+const port = parseInt(process.env.BACKEND_PORT || '8000', 10);
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server running on port ${port}`);
 });
