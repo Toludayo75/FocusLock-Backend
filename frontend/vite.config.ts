@@ -12,7 +12,7 @@ export default defineConfig({
   server: {
     port: 5000,
     host: "0.0.0.0",
-    allowedHosts: "all",
+    allowedHosts: [".replit.dev", ".repl.co", "localhost", "127.0.0.1"],
     proxy: {
       "/api": {
         target: "http://localhost:8000",
