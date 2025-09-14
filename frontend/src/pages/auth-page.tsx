@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { StrictModeAgreement } from "@/components/modals/strict-mode-agreement";
-import { Shield, Target, Users, Clock } from "lucide-react";
+import { WelcomeFlow } from "@/components/onboarding/welcome-flow";
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
   const { user, loginMutation, registerMutation } = useAuth();
+  const [showOnboarding, setShowOnboarding] = useState(true);
   const [isLogin, setIsLogin] = useState(true);
   const [showStrictMode, setShowStrictMode] = useState(false);
   const [formData, setFormData] = useState({
@@ -24,6 +24,15 @@ export default function AuthPage() {
   if (user) {
     setLocation("/");
     return null;
+  }
+
+  // Show onboarding flow first
+  if (showOnboarding) {
+    return (
+      <WelcomeFlow 
+        onComplete={() => setShowOnboarding(false)}
+      />
+    );
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -53,14 +62,14 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left side - Form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-background">
-        <div className="w-full max-w-md space-y-8">
+    <div className="min-h-screen bg-background">
+      {/* Mobile-first auth form */}
+      <div className="flex items-center justify-center min-h-screen p-4">
+        <div className="w-full max-w-md space-y-6">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-primary" data-testid="app-title">FocusLock</h1>
-            <p className="mt-2 text-muted-foreground">
-              {isLogin ? "Welcome back" : "Join thousands boosting productivity"}
+            <h1 className="text-3xl font-bold text-primary mb-2" data-testid="app-title">FocusLock</h1>
+            <p className="text-muted-foreground">
+              {isLogin ? "Welcome back" : "Join focused achievers"}
             </p>
           </div>
           
@@ -143,60 +152,6 @@ export default function AuthPage() {
               </div>
             </CardContent>
           </Card>
-        </div>
-      </div>
-
-      {/* Right side - Hero section */}
-      <div className="flex-1 bg-gradient-to-br from-primary to-secondary p-8 text-white hidden lg:flex items-center justify-center">
-        <div className="max-w-md text-center space-y-8">
-          <div>
-            <h2 className="text-4xl font-bold mb-4">A planner with teeth</h2>
-            <p className="text-xl text-primary-foreground/80">
-              FocusLock schedules tasks and enforces them by locking your device until you submit proof of completion.
-            </p>
-          </div>
-          
-          <div className="space-y-6">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                <Shield className="w-6 h-6" />
-              </div>
-              <div className="text-left">
-                <h3 className="font-semibold">Strict Enforcement</h3>
-                <p className="text-primary-foreground/70 text-sm">Lock your device to focus apps only</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                <Target className="w-6 h-6" />
-              </div>
-              <div className="text-left">
-                <h3 className="font-semibold">Proof Required</h3>
-                <p className="text-primary-foreground/70 text-sm">Submit screenshots, quizzes, or check-ins</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                <Users className="w-6 h-6" />
-              </div>
-              <div className="text-left">
-                <h3 className="font-semibold">Accountability</h3>
-                <p className="text-primary-foreground/70 text-sm">Partner notifications and progress tracking</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                <Clock className="w-6 h-6" />
-              </div>
-              <div className="text-left">
-                <h3 className="font-semibold">Smart Scheduling</h3>
-                <p className="text-primary-foreground/70 text-sm">Calendar integration with conflict detection</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
