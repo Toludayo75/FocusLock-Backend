@@ -1,16 +1,17 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/layout/header";
 import { BottomNavigation } from "@/components/layout/bottom-navigation";
-import { Task } from "@/types/task";
+import { TutorialSystem, firstTimeTutorialSteps, useTutorial } from "@/components/onboarding/tutorial-system";
+import { Task } from "@/types/schema";
 import { CheckCircle, Clock, Flame, Target } from "lucide-react";
 import { format } from "date-fns";
 
 export default function HomePage() {
-  const [nextTaskCountdown, setNextTaskCountdown] = useState("1h 23m");
+  const { showTutorial, startTutorial, closeTutorial, completeTutorial } = useTutorial();
   
   const { data: todayTasks = [] } = useQuery<Task[]>({
     queryKey: ["/api/tasks", "today"],
@@ -43,6 +44,16 @@ export default function HomePage() {
   };
 
   const nextTask = todayTasks.find(task => task.status === 'PENDING');
+
+  // Start tutorial for first-time users
+  useEffect(() => {
+    // Small delay to let the page load before showing tutorial
+    const timer = setTimeout(() => {
+      startTutorial();
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [startTutorial]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -80,7 +91,7 @@ export default function HomePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Current Streak</p>
-                  <p className="text-2xl font-bold text-accent">{stats?.streak || 0} days</p>
+                  <p className="text-2xl font-bold text-accent">0 days</p>
                 </div>
                 <Flame className="h-8 w-8 text-accent" />
               </div>
@@ -101,7 +112,7 @@ export default function HomePage() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-3xl font-bold">{nextTaskCountdown}</p>
+                  <p className="text-3xl font-bold">1h 23m</p>
                   <p className="text-sm text-primary-foreground/80">remaining</p>
                 </div>
               </div>
@@ -182,6 +193,13 @@ export default function HomePage() {
       </main>
 
       <BottomNavigation currentTab="home" />
+      
+      <TutorialSystem
+        steps={firstTimeTutorialSteps}
+        isOpen={showTutorial}
+        onClose={closeTutorial}
+        onComplete={completeTutorial}
+      />
     </div>
   );
 }
