@@ -3,8 +3,10 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000",
-  withCredentials: true,
+  withCredentials: false, // Temporarily disable credentials to test
 });
+
+console.log('API baseURL:', api.defaults.baseURL);
 
 async function throwIfResNotOk(error: any) {
   if (error.response) {
