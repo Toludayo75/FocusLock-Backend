@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,11 +7,14 @@ import { Header } from "@/components/layout/header";
 import { BottomNavigation } from "@/components/layout/bottom-navigation";
 import { TutorialSystem, firstTimeTutorialSteps, useTutorial } from "@/components/onboarding/tutorial-system";
 import { Task } from "@/types/schema";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, Clock, Flame, Target } from "lucide-react";
 import { format } from "date-fns";
 
 export default function HomePage() {
   const { showTutorial, startTutorial, closeTutorial, completeTutorial } = useTutorial();
+  const { toast } = useToast();
   
   const { data: todayTasks = [] } = useQuery<Task[]>({
     queryKey: ["/api/tasks", "today"],
@@ -19,6 +22,26 @@ export default function HomePage() {
 
   const { data: stats } = useQuery({
     queryKey: ["/api/stats"],
+  });
+
+  const startTaskMutation = useMutation({
+    mutationFn: async (taskId: string) => {
+      await apiRequest("PATCH", `/api/tasks/${taskId}`, { status: "ACTIVE" });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
+      toast({
+        title: "Task started",
+        description: "Your task is now active",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
   });
 
   const completedToday = todayTasks.filter(task => task.status === 'COMPLETED').length;
@@ -120,8 +143,10 @@ export default function HomePage() {
               <Button 
                 className="mt-4 bg-white text-primary hover:bg-gray-100" 
                 data-testid="button-start-now"
+                onClick={() => startTaskMutation.mutate(nextTask.id)}
+                disabled={startTaskMutation.isPending}
               >
-                Start Now
+                {startTaskMutation.isPending ? "Starting..." : "Start Now"}
               </Button>
             </CardContent>
           </Card>
