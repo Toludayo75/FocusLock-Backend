@@ -6,7 +6,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:5000",
+  origin: true, // Allow any origin during development
   credentials: true,
 }));
 app.use(express.json());
