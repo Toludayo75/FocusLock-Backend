@@ -145,7 +145,7 @@ export class DatabaseStorage implements IStorage {
     const userTasks = await db
       .select()
       .from(tasks)
-      .where(eq(tasks.user_id, userId));
+      .where(eq(tasks.userId, userId));
 
     const totalTasks = userTasks.length;
     const completedTasks = userTasks.filter(t => t.status === 'COMPLETED').length;

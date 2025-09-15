@@ -30,6 +30,34 @@ export function registerRoutes(app: Express): void {
   setupAuth(app);
 
   // Task routes
+  app.get("/api/tasks/today", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      const tasks = await storage.getTasksByUser(req.user!.id, 'today');
+      res.json(tasks);
+    } catch (error) {
+      console.error("Error fetching today's tasks:", error);
+      res.status(500).json({ message: "Failed to fetch today's tasks" });
+    }
+  });
+
+  app.get("/api/tasks/week", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      const tasks = await storage.getTasksByUser(req.user!.id, 'week');
+      res.json(tasks);
+    } catch (error) {
+      console.error("Error fetching week's tasks:", error);
+      res.status(500).json({ message: "Failed to fetch week's tasks" });
+    }
+  });
+
   app.get("/api/tasks", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Unauthorized" });

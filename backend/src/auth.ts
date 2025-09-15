@@ -102,13 +102,15 @@ export function setupAuth(app: Express): void {
 
       req.login(user, (err) => {
         if (err) return next(err);
-        res.status(201).json({
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          strictModeEnabled: user.strictModeEnabled,
-          uninstallProtectionEnabled: user.uninstallProtectionEnabled,
-          createdAt: user.createdAt,
+        req.session.save(() => {
+          res.status(201).json({
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            strictModeEnabled: user.strictModeEnabled,
+            uninstallProtectionEnabled: user.uninstallProtectionEnabled,
+            createdAt: user.createdAt,
+          });
         });
       });
     } catch (error) {
@@ -137,13 +139,15 @@ export function setupAuth(app: Express): void {
 
       req.login(user, (err) => {
         if (err) return next(err);
-        res.json({
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          strictModeEnabled: user.strictModeEnabled,
-          uninstallProtectionEnabled: user.uninstallProtectionEnabled,
-          createdAt: user.createdAt,
+        req.session.save(() => {
+          res.json({
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            strictModeEnabled: user.strictModeEnabled,
+            uninstallProtectionEnabled: user.uninstallProtectionEnabled,
+            createdAt: user.createdAt,
+          });
         });
       });
     })(req, res, next);
