@@ -151,8 +151,14 @@ export class DatabaseStorage implements IStorage {
     const completedTasks = userTasks.filter(t => t.status === 'COMPLETED').length;
     const pendingTasks = userTasks.filter(t => t.status === 'PENDING').length;
 
-    // Calculate current streak (simplified - in real app would be more sophisticated)
-    const streak = 7; // Mock data
+    // Calculate current streak based on actual task completion
+    let streak = 0;
+    if (completedTasks > 0) {
+      // For now, calculate a simple streak based on completion rate
+      // In a real app, this would check consecutive days of task completion
+      const recentCompletionRate = completedTasks / Math.max(totalTasks, 1);
+      streak = Math.floor(recentCompletionRate * 10); // Simple calculation
+    }
 
     return {
       totalTasks,

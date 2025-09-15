@@ -143,7 +143,24 @@ export default function HomePage() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-3xl font-bold">1h 23m</p>
+                  <p className="text-3xl font-bold">
+                    {(() => {
+                      const now = new Date();
+                      const startTime = new Date(nextTask.startAt);
+                      const diffMs = startTime.getTime() - now.getTime();
+                      
+                      if (diffMs <= 0) return "Starting soon";
+                      
+                      const hours = Math.floor(diffMs / (1000 * 60 * 60));
+                      const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                      
+                      if (hours > 0) {
+                        return `${hours}h ${minutes}m`;
+                      } else {
+                        return `${minutes}m`;
+                      }
+                    })()}
+                  </p>
                   <p className="text-sm text-primary-foreground/80">remaining</p>
                 </div>
               </div>
