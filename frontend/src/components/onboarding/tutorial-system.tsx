@@ -20,6 +20,8 @@ interface TutorialSystemProps {
 
 export function TutorialSystem({ steps, isOpen, onClose, onComplete }: TutorialSystemProps) {
   const [currentStep, setCurrentStep] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   useEffect(() => {
     // Skip tutorial if user has already seen it
@@ -48,13 +50,51 @@ export function TutorialSystem({ steps, isOpen, onClose, onComplete }: TutorialS
     onClose();
   };
 
+  const previousStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  // Swipe gesture handling
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe && currentStep < steps.length - 1) {
+      nextStep();
+    } else if (isRightSwipe && currentStep > 0) {
+      previousStep();
+    }
+    
+    setTouchStart(null);
+    setTouchEnd(null);
+  };
+
   return (
     <>
       {/* Overlay */}
       <div className="fixed inset-0 bg-black/50 z-[150]" onClick={skipTutorial} />
       
       {/* Tutorial card */}
-      <Card className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-sm mx-4 z-[151]">
+      <Card 
+        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-sm mx-4 z-[151]"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         <CardContent className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
@@ -83,13 +123,26 @@ export function TutorialSystem({ steps, isOpen, onClose, onComplete }: TutorialS
 
           {/* Actions */}
           <div className="flex items-center justify-between mt-6">
-            <Button 
-              variant="outline" 
-              onClick={skipTutorial}
-              data-testid="button-skip"
-            >
-              Skip Tutorial
-            </Button>
+            <div className="flex items-center space-x-2">
+              {currentStep > 0 && (
+                <Button 
+                  variant="outline" 
+                  onClick={previousStep}
+                  data-testid="button-back-tutorial"
+                  size="sm"
+                >
+                  Back
+                </Button>
+              )}
+              <Button 
+                variant="outline" 
+                onClick={skipTutorial}
+                data-testid="button-skip"
+                size="sm"
+              >
+                Skip
+              </Button>
+            </div>
             
             <Button 
               onClick={nextStep}

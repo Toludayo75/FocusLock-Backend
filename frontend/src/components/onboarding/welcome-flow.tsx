@@ -9,6 +9,8 @@ interface WelcomeFlowProps {
 
 export function WelcomeFlow({ onComplete }: WelcomeFlowProps) {
   const [currentScreen, setCurrentScreen] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   const screens = [
     {
@@ -55,6 +57,33 @@ export function WelcomeFlow({ onComplete }: WelcomeFlowProps) {
     setCurrentScreen(index);
   };
 
+  // Swipe gesture handling
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe && currentScreen < screens.length - 1) {
+      nextScreen();
+    } else if (isRightSwipe && currentScreen > 0) {
+      prevScreen();
+    }
+    
+    setTouchStart(null);
+    setTouchEnd(null);
+  };
+
   const current = screens[currentScreen];
   const IconComponent = current.icon;
 
@@ -86,7 +115,12 @@ export function WelcomeFlow({ onComplete }: WelcomeFlowProps) {
 
       {/* Main content */}
       <div className="flex-1 flex items-center justify-center p-6">
-        <Card className="w-full max-w-md">
+        <Card 
+          className="w-full max-w-md"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           <CardContent className="p-8">
             <div className={`text-center space-y-6 bg-gradient-to-br ${current.gradient} text-white rounded-lg p-8 mb-6`}>
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto">
