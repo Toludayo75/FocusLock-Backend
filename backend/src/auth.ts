@@ -4,7 +4,7 @@ import { Express } from "express";
 import session from "express-session";
 import bcrypt from "bcrypt";
 import { storage } from "./storage.js";
-import { User } from "./schema.js";
+import { User as DatabaseUser } from "./schema.js";
 import { z } from "zod";
 
 const registerSchema = z.object({
@@ -20,7 +20,7 @@ const loginSchema = z.object({
 
 declare global {
   namespace Express {
-    interface User extends User {}
+    interface User extends DatabaseUser {}
   }
 }
 
@@ -129,7 +129,7 @@ export function setupAuth(app: Express): void {
       }
     }
 
-    passport.authenticate("local", (err: any, user: User | false, info: any) => {
+    passport.authenticate("local", (err: any, user: DatabaseUser | false, info: any) => {
       if (err) return next(err);
       if (!user) {
         return res.status(401).json({ message: info?.message || "Authentication failed" });
