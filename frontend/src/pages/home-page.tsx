@@ -12,6 +12,14 @@ import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, Clock, Flame, Target } from "lucide-react";
 import { format } from "date-fns";
 
+interface HomeStats {
+  totalTasks: number;
+  completedTasks: number;
+  pendingTasks: number;
+  streak: number;
+  completionRate: number;
+}
+
 export default function HomePage() {
   const { showTutorial, startTutorial, closeTutorial, completeTutorial } = useTutorial();
   const { toast } = useToast();
@@ -20,7 +28,7 @@ export default function HomePage() {
     queryKey: ["/api/tasks", "today"],
   });
 
-  const { data: stats } = useQuery({
+  const { data: stats } = useQuery<HomeStats>({
     queryKey: ["/api/stats"],
   });
 
@@ -114,7 +122,7 @@ export default function HomePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Current Streak</p>
-                  <p className="text-2xl font-bold text-accent">0 days</p>
+                  <p className="text-2xl font-bold text-accent">{stats?.streak || 0} days</p>
                 </div>
                 <Flame className="h-8 w-8 text-accent" />
               </div>
