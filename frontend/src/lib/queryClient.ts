@@ -3,10 +3,8 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000",
-  withCredentials: false, // Temporarily disable credentials to test
+  withCredentials: true,
 });
-
-console.log('API baseURL:', api.defaults.baseURL);
 
 async function throwIfResNotOk(error: any) {
   if (error.response) {
@@ -22,16 +20,13 @@ export async function apiRequest(
   data?: unknown | undefined,
 ): Promise<any> {
   try {
-    console.log('Making API request:', method, url, data);
     const response = await api.request({
       method,
       url,
       data,
     });
-    console.log('API response:', response.status, response.data);
     return response;
   } catch (error) {
-    console.error('API request failed:', error);
     await throwIfResNotOk(error);
   }
 }
