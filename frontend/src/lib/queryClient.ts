@@ -20,13 +20,16 @@ export async function apiRequest(
   data?: unknown | undefined,
 ): Promise<any> {
   try {
+    console.log('Making API request:', method, url, data);
     const response = await api.request({
       method,
       url,
       data,
     });
+    console.log('API response:', response.status, response.data);
     return response;
   } catch (error) {
+    console.error('API request failed:', error);
     await throwIfResNotOk(error);
   }
 }
