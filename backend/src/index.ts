@@ -4,10 +4,24 @@ import { registerRoutes } from "./routes.js";
 
 const app = express();
 
-// Middleware
+// Middleware - Enhanced CORS for Replit environment
 app.use(cors({
-  origin: true, // Allow any origin during development
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow any origin during development, especially Replit domains
+    if (origin.includes('replit.dev') || origin.includes('localhost')) {
+      return callback(null, true);
+    }
+    
+    // Allow any origin for development
+    return callback(null, true);
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
