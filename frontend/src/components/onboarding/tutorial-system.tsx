@@ -51,10 +51,10 @@ export function TutorialSystem({ steps, isOpen, onClose, onComplete }: TutorialS
   return (
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 bg-black/50 z-50" onClick={skipTutorial} />
+      <div className="fixed inset-0 bg-black/50 z-[150]" onClick={skipTutorial} />
       
       {/* Tutorial card */}
-      <Card className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-sm mx-4 z-51">
+      <Card className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-sm mx-4 z-[151]">
         <CardContent className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
