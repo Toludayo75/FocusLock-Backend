@@ -20,11 +20,24 @@ export async function apiRequest(
   data?: unknown | undefined,
 ): Promise<any> {
   try {
-    const response = await api.request({
+    const config: any = {
       method,
       url,
-      data,
-    });
+    };
+
+    if (data instanceof FormData) {
+      // For FormData, let axios handle the Content-Type automatically
+      config.data = data;
+      // Don't set Content-Type header - axios will set it with boundary
+    } else if (data !== undefined) {
+      // For regular data, send as JSON
+      config.data = data;
+      config.headers = {
+        'Content-Type': 'application/json',
+      };
+    }
+
+    const response = await api.request(config);
     return response;
   } catch (error) {
     await throwIfResNotOk(error);

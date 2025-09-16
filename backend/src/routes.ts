@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { setupAuth } from "./auth.js";
 import { storage } from "./storage.js";
 import { z } from "zod";
-import { Task, InsertTask, User } from "./schema.js";
+import { Task, InsertTask, User as AppUser } from "./schema.js";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -24,7 +24,7 @@ const insertUserSchema = z.object({
 
 declare global {
   namespace Express {
-    interface User extends User {}
+    interface User extends AppUser {}
   }
 }
 
@@ -111,14 +111,18 @@ export function registerRoutes(app: Express): void {
     }
 
     try {
-      // Parse form data - JSON fields need to be parsed when using multipart/form-data
+      // Parse form data - handle both JSON and multipart/form-data
       const formData = {
         title: req.body.title,
         startAt: req.body.startAt,
         durationMinutes: parseInt(req.body.durationMinutes),
         strictLevel: req.body.strictLevel,
-        targetApps: JSON.parse(req.body.targetApps || '[]'),
-        proofMethods: JSON.parse(req.body.proofMethods || '["screenshot"]'),
+        targetApps: Array.isArray(req.body.targetApps) 
+          ? req.body.targetApps 
+          : JSON.parse(req.body.targetApps || '[]'),
+        proofMethods: Array.isArray(req.body.proofMethods) 
+          ? req.body.proofMethods 
+          : JSON.parse(req.body.proofMethods || '["screenshot"]'),
       };
 
       const taskData = insertTaskSchema.parse(formData);
