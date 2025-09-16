@@ -281,7 +281,11 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
                 <RadioGroupItem value="SOFT" id="soft" className="sr-only peer" />
                 <Label
                   htmlFor="soft"
-                  className="flex flex-col items-center p-4 border border-border rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/10 hover:border-primary/50 transition-colors"
+                  className={`flex flex-col items-center p-4 border rounded-lg cursor-pointer hover:border-primary/50 transition-colors ${
+                    form.watch("strictLevel") === "SOFT" 
+                      ? "border-primary bg-primary/10" 
+                      : "border-border"
+                  }`}
                   data-testid="option-soft"
                 >
                   <div className="w-8 h-8 bg-secondary rounded-full mb-2 flex items-center justify-center">
@@ -296,7 +300,11 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
                 <RadioGroupItem value="MEDIUM" id="medium" className="sr-only peer" />
                 <Label
                   htmlFor="medium"
-                  className="flex flex-col items-center p-4 border border-border rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/10 hover:border-primary/50 transition-colors"
+                  className={`flex flex-col items-center p-4 border rounded-lg cursor-pointer hover:border-primary/50 transition-colors ${
+                    form.watch("strictLevel") === "MEDIUM" 
+                      ? "border-primary bg-primary/10" 
+                      : "border-border"
+                  }`}
                   data-testid="option-medium"
                 >
                   <div className="w-8 h-8 bg-accent rounded-full mb-2 flex items-center justify-center">
@@ -311,7 +319,11 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
                 <RadioGroupItem value="HARD" id="hard" className="sr-only peer" />
                 <Label
                   htmlFor="hard"
-                  className="flex flex-col items-center p-4 border border-border rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/10 hover:border-primary/50 transition-colors"
+                  className={`flex flex-col items-center p-4 border rounded-lg cursor-pointer hover:border-primary/50 transition-colors ${
+                    form.watch("strictLevel") === "HARD" 
+                      ? "border-primary bg-primary/10" 
+                      : "border-border"
+                  }`}
                   data-testid="option-hard"
                 >
                   <div className="w-8 h-8 bg-destructive rounded-full mb-2 flex items-center justify-center">
