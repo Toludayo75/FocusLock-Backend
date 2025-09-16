@@ -368,9 +368,16 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
             </RadioGroup>
           </div>
 
+          {/* Task Content Selection */}
+          <div className="bg-muted/50 p-4 rounded-lg border border-dashed">
+            <h3 className="font-medium mb-2">Choose Your Task Content</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Select at least one option: upload a PDF to read OR choose target apps to focus on.
+            </p>
+          
           {/* PDF Upload */}
           <div>
-            <Label htmlFor="pdfFile">PDF Document (Optional)</Label>
+            <Label htmlFor="pdfFile">PDF Document</Label>
             <div className="flex items-center gap-3 mt-2">
               <input
                 type="file"
@@ -387,10 +394,24 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
                 </label>
               </Button>
               {selectedPdf && (
-                <span className="text-sm text-muted-foreground">{selectedPdf.name}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">{selectedPdf.name}</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedPdf(null);
+                      form.setValue('pdfFile', null);
+                    }}
+                    className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="w-3 h-3" />
+                  </Button>
+                </div>
               )}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Upload a PDF to read during the task</p>
+            <p className="text-xs text-muted-foreground mt-1">Upload a PDF to read during the task (alternative to selecting target apps)</p>
           </div>
 
           {/* Target Apps Selection */}
@@ -427,7 +448,8 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
                 </div>
               )}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">These apps will be available during task enforcement</p>
+            <p className="text-xs text-muted-foreground mt-1">Select apps to focus on during the task (alternative to uploading a PDF)</p>
+          </div>
           </div>
 
           {/* Proof Methods */}
