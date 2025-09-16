@@ -62,7 +62,20 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
 
   const createTaskMutation = useMutation({
     mutationFn: async (data: InsertTask) => {
-      const response = await apiRequest("POST", "/api/tasks", data);
+      // Create FormData to handle file upload
+      const formData = new FormData();
+      formData.append('title', data.title);
+      formData.append('startAt', data.startAt);
+      formData.append('durationMinutes', data.durationMinutes.toString());
+      formData.append('strictLevel', data.strictLevel);
+      formData.append('targetApps', JSON.stringify(data.targetApps));
+      formData.append('proofMethods', JSON.stringify(data.proofMethods));
+      
+      if (data.pdfFile) {
+        formData.append('pdfFile', data.pdfFile);
+      }
+
+      const response = await apiRequest("POST", "/api/tasks", formData);
       return response.data;
     },
     onSuccess: async (/* createdTask */) => {
