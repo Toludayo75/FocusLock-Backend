@@ -35,6 +35,7 @@ export interface Task {
   strictLevel: StrictLevel;
   targetApps: string[];
   proofMethods: string[];
+  pdfFileUrl: string | null;
   status: TaskStatus;
   createdAt: string;
   updatedAt: string;

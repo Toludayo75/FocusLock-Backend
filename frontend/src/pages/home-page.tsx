@@ -9,6 +9,7 @@ import { TutorialSystem, firstTimeTutorialSteps, useTutorial } from "@/component
 import { Task } from "@/types/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useMobileEnforcement } from "@/hooks/use-mobile-enforcement";
 import { CheckCircle, Clock, Flame, Target } from "lucide-react";
 import { format } from "date-fns";
 
@@ -23,6 +24,7 @@ interface HomeStats {
 export default function HomePage() {
   const { showTutorial, startTutorial, closeTutorial, completeTutorial } = useTutorial();
   const { toast } = useToast();
+  const mobileEnforcement = useMobileEnforcement();
   
   const { data: todayTasks = [] } = useQuery<Task[]>({
     queryKey: ["/api/tasks", "today"],
@@ -33,14 +35,39 @@ export default function HomePage() {
   });
 
   const startTaskMutation = useMutation({
-    mutationFn: async (taskId: string) => {
+    mutationFn: async ({ taskId, pdfWindow }: { taskId: string, pdfWindow?: Window | null }) => {
+      // Update status to ACTIVE
       await apiRequest("PATCH", `/api/tasks/${taskId}`, { status: "ACTIVE" });
+      
+      // Get the full task details
+      const taskResponse = await apiRequest("GET", `/api/tasks/${taskId}`);
+      return { task: taskResponse.data, pdfWindow };
     },
-    onSuccess: () => {
+    onSuccess: async ({ task: startedTask, pdfWindow }: { task: Task, pdfWindow?: Window | null }) => {
+      // 1. Open PDF if it exists
+      if (startedTask.pdfFileUrl && pdfWindow) {
+        pdfWindow.location.href = startedTask.pdfFileUrl;
+        console.log("📄 Opening PDF:", startedTask.pdfFileUrl);
+      }
+      
+      // 2. Start enforcement with task parameters
+      const enforcementStarted = await mobileEnforcement.startEnforcement({
+        strictLevel: startedTask.strictLevel,
+        targetApps: startedTask.targetApps,
+        durationMinutes: startedTask.durationMinutes
+      });
+      
+      if (enforcementStarted) {
+        console.log(`🔒 Enforcement started: ${startedTask.strictLevel} level for ${startedTask.durationMinutes} minutes`);
+      }
+      
+      // 3. Show success notification
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
       toast({
         title: "Task started",
-        description: "Your task is now active",
+        description: enforcementStarted ? 
+          (startedTask.pdfFileUrl ? "PDF opened and enforcement active!" : "Task active with enforcement!") :
+          (startedTask.pdfFileUrl ? "PDF opened (enforcement failed)" : "Task started (enforcement failed)")
       });
     },
     onError: (error: Error) => {
@@ -168,7 +195,11 @@ export default function HomePage() {
               <Button 
                 className="mt-4 bg-white text-primary hover:bg-gray-100" 
                 data-testid="button-start-now"
-                onClick={() => startTaskMutation.mutate(nextTask.id)}
+                onClick={() => {
+                  // Open PDF window synchronously to prevent popup blocking
+                  const pdfWindow = nextTask.pdfFileUrl ? window.open('about:blank', '_blank') : null;
+                  startTaskMutation.mutate({ taskId: nextTask.id, pdfWindow });
+                }}
                 disabled={startTaskMutation.isPending}
               >
                 {startTaskMutation.isPending ? "Starting..." : "Start Now"}
