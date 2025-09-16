@@ -1,0 +1,18 @@
+<!-- ADD THESE SECTIONS TO YOUR CAPACITOR AndroidManifest.xml -->
+
+<!-- Device Administrator Permissions -->
+<uses-permission android:name="android.permission.BIND_DEVICE_ADMIN" />
+<uses-permission android:name="android.permission.WAKE_LOCK" />
+<uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+
+<!-- ADD THIS RECEIVER INSIDE <application> TAG -->
+<receiver android:name=".DeviceAdminReceiver"
+    android:permission="android.permission.BIND_DEVICE_ADMIN"
+    android:exported="true">
+    <meta-data android:name="android.app.device_admin" 
+               android:resource="@xml/device_admin_receiver" />
+    <intent-filter>
+        <action android:name="android.app.action.DEVICE_ADMIN_ENABLED"/>
+        <action android:name="android.app.action.DEVICE_ADMIN_DISABLED"/>
+    </intent-filter>
+</receiver>

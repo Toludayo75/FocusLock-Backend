@@ -18,6 +18,8 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { InsertTask } from "@/types/schema";
 import { X, Bell, Clock, Shield, Upload, Smartphone } from "lucide-react";
+// UNCOMMENT FOR MOBILE VERSION:
+// import { useMobileEnforcement } from "@/hooks/use-mobile-enforcement";
 
 const taskSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -41,6 +43,9 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
   const [proofMethods, setProofMethods] = useState<string[]>(['screenshot']);
   const [selectedPdf, setSelectedPdf] = useState<File | null>(null);
   const [targetApps, setTargetApps] = useState<string[]>([]);
+  
+  // UNCOMMENT FOR MOBILE VERSION:
+  // const mobileEnforcement = useMobileEnforcement();
 
   const form = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
@@ -60,12 +65,40 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
       const response = await apiRequest("POST", "/api/tasks", data);
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: async (/* createdTask */) => {
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
-      toast({
-        title: "Task created",
-        description: "Your task has been created successfully",
-      });
+      
+      // UNCOMMENT FOR MOBILE VERSION - START ENFORCEMENT IF TASK STARTS SOON:
+      // const taskStartTime = new Date(createdTask.startAt);
+      // const now = new Date();
+      // const minutesUntilStart = (taskStartTime.getTime() - now.getTime()) / (1000 * 60);
+      // 
+      // if (minutesUntilStart <= 5) { // Start enforcement if task starts within 5 minutes
+      //   const enforcementStarted = await mobileEnforcement.startEnforcement({
+      //     strictLevel: createdTask.strictLevel,
+      //     targetApps: createdTask.targetApps,
+      //     durationMinutes: createdTask.durationMinutes
+      //   });
+      //   
+      //   if (enforcementStarted) {
+      //     toast({
+      //       title: "Task created & enforcement started",
+      //       description: "Device enforcement is now active for this task",
+      //     });
+      //   } else {
+      //     toast({
+      //       title: "Task created",
+      //       description: "Please enable Device Administrator for enforcement",
+      //       variant: "destructive"
+      //     });
+      //   }
+      // } else {
+        toast({
+          title: "Task created",
+          description: "Your task has been created successfully",
+        });
+      // }
+      
       onClose();
       form.reset();
       setProofMethods(['screenshot']);
@@ -126,9 +159,11 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
     form.setValue('targetApps', updatedApps);
   };
 
-  // Mobile app selection handler (commented out for web version)
+  
   const handleAppSelection = () => {
-    // TODO: Mobile implementation - get installed apps from device
+    // TODO: WEB PWA IMPLEMENTATION (FOR BROWSER-BASED MOBILE APPS)
+    // UNCOMMENT THIS IF CONVERTING TO PWA WITH MANIFEST FILE
+    // REQUIRES: WEB APP MANIFEST + HTTPS + SUPPORTED BROWSER
     // if (window.navigator && 'getInstalledRelatedApps' in window.navigator) {
     //   navigator.getInstalledRelatedApps().then(apps => {
     //     const installedApps = apps.map(app => ({
@@ -139,26 +174,38 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
     //     setAvailableApps(installedApps);
     //   }).catch(err => {
     //     console.log('Could not get installed apps:', err);
-    //     // Fallback to common apps list
     //     setAvailableApps(getCommonApps());
     //   });
-    // } else {
-    //   // For web version, show common web apps
-    //   setAvailableApps(getCommonWebApps());
     // }
-    
-    // For now, just show a temporary notification for demo
+
+    // TODO: CAPACITOR ANDROID IMPLEMENTATION (FOR NATIVE ANDROID APP)
+    // UNCOMMENT THIS WHEN CONVERTING TO CAPACITOR + ANDROID STUDIO
+    // REQUIRES: npm install @capacitor-community/app-launcher
+    // REQUIRES: ADD ANDROID PERMISSION IN AndroidManifest.xml
+    // try {
+    //   const apps = await AppLauncher.getInstalledApps();
+    //   const installedApps = apps.map(app => ({
+    //     name: app.name,
+    //     packageId: app.packageId,
+    //     icon: app.icon
+    //   }));
+    //   setAvailableApps(installedApps);
+    // } catch (error) {
+    //   console.log('Could not get installed apps:', error);
+    //   setAvailableApps(getCommonApps());
+    // }
+
+    // CURRENT WEB APP BEHAVIOR - REMOVE WHEN MOBILE IS IMPLEMENTED
     const mockApps = [
       'Chrome', 'Firefox', 'Safari', 'Edge',
       'VS Code', 'Notion', 'Discord', 'Slack'
     ];
-    
+
     toast({
       title: "App Selection",
       description: "Mobile app selection feature coming soon. For now, manually add app names.",
     });
-    
-    // This would open an app selection modal in the real implementation
+
     console.log('Available apps:', mockApps);
   };
 
