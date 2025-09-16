@@ -93,7 +93,10 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
       return response.data;
     },
     onSuccess: async (/* createdTask */) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
+      // Invalidate all task-related queries to refresh the UI
+      queryClient.invalidateQueries({ 
+        predicate: (query) => Array.isArray(query.queryKey) && query.queryKey[0] === '/api/tasks'
+      });
       
       // UNCOMMENT FOR MOBILE VERSION - START ENFORCEMENT IF TASK STARTS SOON:
       // const taskStartTime = new Date(createdTask.startAt);

@@ -105,10 +105,15 @@ export function registerRoutes(app: Express): void {
     }
   });
 
-  app.post("/api/tasks", upload.single('pdfFile'), async (req, res) => {
+  // Auth middleware to prevent unauthorized file uploads
+  const requireAuth = (req: any, res: any, next: any) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Unauthorized" });
     }
+    next();
+  };
+
+  app.post("/api/tasks", requireAuth, upload.single('pdfFile'), async (req, res) => {
 
     try {
       // Parse form data - handle both JSON and multipart/form-data
