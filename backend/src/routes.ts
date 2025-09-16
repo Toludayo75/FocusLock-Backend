@@ -123,6 +123,13 @@ export function registerRoutes(app: Express): void {
 
       const taskData = insertTaskSchema.parse(formData);
       
+      // Validate that at least one of target apps or PDF file is provided
+      if (taskData.targetApps.length === 0 && !req.file) {
+        return res.status(400).json({ 
+          message: "Provide target apps or a PDF file. At least one is required." 
+        });
+      }
+      
       let pdfFileUrl = null;
       if (req.file) {
         // Store relative path to uploaded PDF
