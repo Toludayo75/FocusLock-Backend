@@ -92,42 +92,16 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
       const response = await apiRequest("POST", "/api/tasks", formData);
       return response.data;
     },
-    onSuccess: async (/* createdTask */) => {
-      // Invalidate all task-related queries to refresh the UI
-      queryClient.invalidateQueries({ 
-        predicate: (query) => Array.isArray(query.queryKey) && query.queryKey[0] === '/api/tasks'
-      });
+    onSuccess: () => {
+      // Invalidate task-related queries efficiently
+      queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/tasks", "today"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
       
-      // UNCOMMENT FOR MOBILE VERSION - START ENFORCEMENT IF TASK STARTS SOON:
-      // const taskStartTime = new Date(createdTask.startAt);
-      // const now = new Date();
-      // const minutesUntilStart = (taskStartTime.getTime() - now.getTime()) / (1000 * 60);
-      // 
-      // if (minutesUntilStart <= 5) { // Start enforcement if task starts within 5 minutes
-      //   const enforcementStarted = await mobileEnforcement.startEnforcement({
-      //     strictLevel: createdTask.strictLevel,
-      //     targetApps: createdTask.targetApps,
-      //     durationMinutes: createdTask.durationMinutes
-      //   });
-      //   
-      //   if (enforcementStarted) {
-      //     toast({
-      //       title: "Task created & enforcement started",
-      //       description: "Device enforcement is now active for this task",
-      //     });
-      //   } else {
-      //     toast({
-      //       title: "Task created",
-      //       description: "Please enable Device Administrator for enforcement",
-      //       variant: "destructive"
-      //     });
-      //   }
-      // } else {
-        toast({
-          title: "Task created",
-          description: "Your task has been created successfully",
-        });
-      // }
+      toast({
+        title: "Task created",
+        description: "Your task has been created successfully",
+      });
       
       onClose();
       form.reset();
