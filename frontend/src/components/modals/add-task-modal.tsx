@@ -14,19 +14,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Card, CardContent } from "@/components/ui/card";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { InsertTask } from "@/types/task";
-import { X, Bell, Clock, Shield } from "lucide-react";
+import { InsertTask } from "@/types/schema";
+import { X, Bell, Clock, Shield, Upload, Smartphone } from "lucide-react";
 
 const taskSchema = z.object({
   title: z.string().min(1, "Title is required"),
   startAt: z.string().min(1, "Start time is required"),
   durationMinutes: z.number().min(1, "Duration must be at least 1 minute").max(480, "Duration cannot exceed 8 hours"),
   strictLevel: z.enum(['SOFT', 'MEDIUM', 'HARD']),
-  targetApps: z.string().min(1, "At least one target app is required"),
+  targetApps: z.array(z.string()).min(1, "At least one target app is required"),
   proofMethods: z.array(z.string()).min(1, "At least one proof method is required"),
+  pdfFile: z.instanceof(File).optional(),
 });
 
 type TaskFormData = z.infer<typeof taskSchema>;
@@ -39,6 +39,8 @@ interface AddTaskModalProps {
 export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
   const { toast } = useToast();
   const [proofMethods, setProofMethods] = useState<string[]>(['screenshot']);
+  const [selectedPdf, setSelectedPdf] = useState<File | null>(null);
+  const [targetApps, setTargetApps] = useState<string[]>([]);
 
   const form = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
@@ -47,8 +49,9 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
       startAt: "",
       durationMinutes: 60,
       strictLevel: 'MEDIUM',
-      targetApps: "",
+      targetApps: [],
       proofMethods: ['screenshot'],
+      pdfFile: undefined,
     },
   });
 
@@ -66,6 +69,8 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
       onClose();
       form.reset();
       setProofMethods(['screenshot']);
+      setSelectedPdf(null);
+      setTargetApps([]);
     },
     onError: (error: Error) => {
       toast({
@@ -78,15 +83,15 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
 
   const onSubmit = (data: TaskFormData) => {
     const startDateTime = new Date(data.startAt);
-    const endDateTime = new Date(startDateTime.getTime() + data.durationMinutes * 60000);
 
     const taskData: InsertTask = {
       title: data.title,
       startAt: startDateTime.toISOString(),
       durationMinutes: data.durationMinutes,
       strictLevel: data.strictLevel,
-      targetApps: data.targetApps.split(',').map(app => app.trim()),
+      targetApps: targetApps,
       proofMethods: proofMethods,
+      pdfFile: selectedPdf || undefined,
     };
 
     createTaskMutation.mutate(taskData);
@@ -99,6 +104,62 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
       setProofMethods(proofMethods.filter(m => m !== method));
     }
     form.setValue('proofMethods', checked ? [...proofMethods, method] : proofMethods.filter(m => m !== method));
+  };
+
+  const handlePdfChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.type === 'application/pdf') {
+      setSelectedPdf(file);
+      form.setValue('pdfFile', file);
+    } else if (file) {
+      toast({
+        title: "Invalid file type",
+        description: "Please select a PDF file",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRemoveApp = (appToRemove: string) => {
+    const updatedApps = targetApps.filter(app => app !== appToRemove);
+    setTargetApps(updatedApps);
+    form.setValue('targetApps', updatedApps);
+  };
+
+  // Mobile app selection handler (commented out for web version)
+  const handleAppSelection = () => {
+    // TODO: Mobile implementation - get installed apps from device
+    // if (window.navigator && 'getInstalledRelatedApps' in window.navigator) {
+    //   navigator.getInstalledRelatedApps().then(apps => {
+    //     const installedApps = apps.map(app => ({
+    //       name: app.name || app.id,
+    //       id: app.id || app.url,
+    //       icon: app.icons?.[0]?.src || ''
+    //     }));
+    //     setAvailableApps(installedApps);
+    //   }).catch(err => {
+    //     console.log('Could not get installed apps:', err);
+    //     // Fallback to common apps list
+    //     setAvailableApps(getCommonApps());
+    //   });
+    // } else {
+    //   // For web version, show common web apps
+    //   setAvailableApps(getCommonWebApps());
+    // }
+    
+    // For now, just show a temporary notification for demo
+    const mockApps = [
+      'Chrome', 'Firefox', 'Safari', 'Edge',
+      'VS Code', 'Notion', 'Discord', 'Slack'
+    ];
+    
+    toast({
+      title: "App Selection",
+      description: "Mobile app selection feature coming soon. For now, manually add app names.",
+    });
+    
+    // This would open an app selection modal in the real implementation
+    console.log('Available apps:', mockApps);
   };
 
   return (
@@ -216,19 +277,66 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
             </RadioGroup>
           </div>
 
-          {/* Target Apps */}
+          {/* PDF Upload */}
           <div>
-            <Label htmlFor="targetApps">Target Apps</Label>
-            <Input
-              id="targetApps"
-              placeholder="e.g., Coursera, VS Code, Chrome"
-              {...form.register("targetApps")}
-              data-testid="input-target-apps"
-            />
-            <p className="text-xs text-muted-foreground mt-1">Separate multiple apps with commas</p>
-            {form.formState.errors.targetApps && (
-              <p className="text-sm text-destructive">{form.formState.errors.targetApps.message}</p>
-            )}
+            <Label htmlFor="pdfFile">PDF Document (Optional)</Label>
+            <div className="flex items-center gap-3 mt-2">
+              <input
+                type="file"
+                accept="application/pdf"
+                onChange={handlePdfChange}
+                className="hidden"
+                id="pdf-input"
+                data-testid="input-pdf"
+              />
+              <Button type="button" variant="outline" asChild>
+                <label htmlFor="pdf-input" className="cursor-pointer">
+                  <Upload className="w-4 h-4 mr-2" />
+                  Choose PDF
+                </label>
+              </Button>
+              {selectedPdf && (
+                <span className="text-sm text-muted-foreground">{selectedPdf.name}</span>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">Upload a PDF to read during the task</p>
+          </div>
+
+          {/* Target Apps Selection */}
+          <div>
+            <Label className="text-base font-medium">Target Apps</Label>
+            <div className="mt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleAppSelection}
+                className="w-full justify-start"
+                data-testid="button-select-apps"
+              >
+                <Smartphone className="w-4 h-4 mr-2" />
+                {targetApps.length > 0 ? `${targetApps.length} apps selected` : 'Select target apps'}
+              </Button>
+              {targetApps.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {targetApps.map((app, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-2 py-1 rounded-md bg-primary/10 text-primary text-sm"
+                    >
+                      {app}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveApp(app)}
+                        className="ml-1 text-primary/60 hover:text-primary"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">These apps will be available during task enforcement</p>
           </div>
 
           {/* Proof Methods */}

@@ -44,11 +44,12 @@ export interface InsertTask {
   userId?: string;
   title: string;
   startAt: string;
-  endAt: string;
+  endAt?: string;
   durationMinutes: number;
   strictLevel: StrictLevel;
   targetApps: string[];
   proofMethods: string[];
+  pdfFile?: File;
   status?: TaskStatus;
 }
 

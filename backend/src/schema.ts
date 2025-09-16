@@ -30,6 +30,7 @@ export const tasks = pgTable("tasks", {
   strictLevel: strictLevelEnum("strict_level").notNull().default('MEDIUM'),
   targetApps: jsonb("target_apps").notNull().default([]), // string array
   proofMethods: jsonb("proof_methods").notNull().default(['screenshot']), // string array
+  pdfFileUrl: text("pdf_file_url"), // for PDF tasks
   status: taskStatusEnum("status").notNull().default('PENDING'),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
   updatedAt: timestamp("updated_at").notNull().default(sql`now()`),

@@ -3,6 +3,9 @@ import { setupAuth } from "./auth.js";
 import { storage } from "./storage.js";
 import { z } from "zod";
 import { Task, InsertTask, User } from "./schema.js";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 
 const insertTaskSchema = z.object({
   title: z.string().min(1),
@@ -73,17 +76,64 @@ export function registerRoutes(app: Express): void {
     }
   });
 
-  app.post("/api/tasks", async (req, res) => {
+  // Configure multer for PDF uploads
+  const storage_config = multer.diskStorage({
+    destination: function (req, file, cb) {
+      const uploadPath = path.join(process.cwd(), 'uploads', 'pdfs');
+      if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath, { recursive: true });
+      }
+      cb(null, uploadPath);
+    },
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + '-' + uniqueSuffix + '.pdf');
+    }
+  });
+
+  const upload = multer({
+    storage: storage_config,
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype === 'application/pdf') {
+        cb(null, true);
+      } else {
+        cb(new Error('Only PDF files are allowed'));
+      }
+    },
+    limits: {
+      fileSize: 10 * 1024 * 1024 // 10MB limit
+    }
+  });
+
+  app.post("/api/tasks", upload.single('pdfFile'), async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
     try {
-      const taskData = insertTaskSchema.parse(req.body);
+      // Parse form data - JSON fields need to be parsed when using multipart/form-data
+      const formData = {
+        title: req.body.title,
+        startAt: req.body.startAt,
+        durationMinutes: parseInt(req.body.durationMinutes),
+        strictLevel: req.body.strictLevel,
+        targetApps: JSON.parse(req.body.targetApps || '[]'),
+        proofMethods: JSON.parse(req.body.proofMethods || '["screenshot"]'),
+      };
+
+      const taskData = insertTaskSchema.parse(formData);
+      
+      let pdfFileUrl = null;
+      if (req.file) {
+        // Store relative path to uploaded PDF
+        pdfFileUrl = `/uploads/pdfs/${req.file.filename}`;
+      }
+
       const task = await storage.createTask({
         ...taskData,
         userId: req.user!.id,
         endAt: new Date(new Date(taskData.startAt).getTime() + taskData.durationMinutes * 60000).toISOString(),
+        pdfFileUrl: pdfFileUrl,
         status: 'PENDING' as const,
       });
       res.status(201).json(task);
