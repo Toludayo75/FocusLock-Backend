@@ -35,13 +35,10 @@ export default function HomePage() {
   });
 
   const startTaskMutation = useMutation({
-    mutationFn: async ({ taskId, pdfWindow }: { taskId: string, pdfWindow?: Window | null }) => {
+    mutationFn: async ({ taskId, taskData, pdfWindow }: { taskId: string, taskData: Task, pdfWindow?: Window | null }) => {
       // Update status to ACTIVE
       await apiRequest("PATCH", `/api/tasks/${taskId}`, { status: "ACTIVE" });
-      
-      // Get the full task details
-      const taskResponse = await apiRequest("GET", `/api/tasks/${taskId}`);
-      return { task: taskResponse.data, pdfWindow };
+      return { task: taskData, pdfWindow };
     },
     onSuccess: async ({ task: startedTask, pdfWindow }: { task: Task, pdfWindow?: Window | null }) => {
       // 1. Open PDF if it exists
@@ -198,7 +195,7 @@ export default function HomePage() {
                 onClick={() => {
                   // Open PDF window synchronously to prevent popup blocking
                   const pdfWindow = nextTask.pdfFileUrl ? window.open('about:blank', '_blank') : null;
-                  startTaskMutation.mutate({ taskId: nextTask.id, pdfWindow });
+                  startTaskMutation.mutate({ taskId: nextTask.id, taskData: nextTask, pdfWindow });
                 }}
                 disabled={startTaskMutation.isPending}
               >
