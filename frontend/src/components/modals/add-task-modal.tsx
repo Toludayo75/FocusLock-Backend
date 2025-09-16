@@ -26,9 +26,23 @@ const taskSchema = z.object({
   startAt: z.string().min(1, "Start time is required"),
   durationMinutes: z.number().min(1, "Duration must be at least 1 minute").max(480, "Duration cannot exceed 8 hours"),
   strictLevel: z.enum(['SOFT', 'MEDIUM', 'HARD']),
-  targetApps: z.array(z.string()).min(1, "At least one target app is required"),
+  targetApps: z.array(z.string()).default([]),
   proofMethods: z.array(z.string()).min(1, "At least one proof method is required"),
-  pdfFile: z.instanceof(File).optional(),
+  pdfFile: z.instanceof(File).optional().nullable(),
+}).superRefine((data, ctx) => {
+  // Require at least one of target apps or PDF file
+  if (data.targetApps.length === 0 && !data.pdfFile) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Select at least one target app or upload a PDF file",
+      path: ["targetApps"],
+    });
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Select at least one target app or upload a PDF file", 
+      path: ["pdfFile"],
+    });
+  }
 });
 
 type TaskFormData = z.infer<typeof taskSchema>;
@@ -56,7 +70,7 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
       strictLevel: 'MEDIUM',
       targetApps: [],
       proofMethods: ['screenshot'],
-      pdfFile: undefined,
+      pdfFile: null,
     },
   });
 
