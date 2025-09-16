@@ -201,9 +201,14 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
       'VS Code', 'Notion', 'Discord', 'Slack'
     ];
 
+    // For now, automatically add some common apps for testing
+    const defaultApps = ['Chrome', 'VS Code', 'Notion'];
+    setTargetApps(defaultApps);
+    form.setValue('targetApps', defaultApps);
+
     toast({
-      title: "App Selection",
-      description: "Mobile app selection feature coming soon. For now, manually add app names.",
+      title: "Apps Selected",
+      description: `Added ${defaultApps.length} common apps. You can remove unwanted ones.`,
     });
 
     console.log('Available apps:', mockApps);
