@@ -3,11 +3,13 @@ import { io, Socket } from 'socket.io-client';
 import { queryClient } from '../lib/queryClient';
 import { useToast } from './use-toast';
 import { useAuth } from './use-auth';
+import { useMobileEnforcement } from './use-mobile-enforcement';
 
 export const useWebSocket = () => {
   const socketRef = useRef<Socket | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
+  const mobileEnforcement = useMobileEnforcement();
 
   useEffect(() => {
     // Connect to WebSocket server using the Vite proxy setup
@@ -38,7 +40,7 @@ export const useWebSocket = () => {
       console.log('Disconnected from WebSocket server:', reason);
     });
 
-    socket.on('taskAutoStarted', (data: {
+    socket.on('taskAutoStarted', async (data: {
       taskId: string;
       title: string;
       userId: string;
@@ -51,6 +53,23 @@ export const useWebSocket = () => {
       
       // Invalidate tasks query to refresh the UI
       queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+      
+      // 🚀 AUTOMATICALLY START MOBILE ENFORCEMENT
+      try {
+        const enforcementStarted = await mobileEnforcement.startEnforcement({
+          strictLevel: data.strictLevel,
+          targetApps: data.targetApps,
+          durationMinutes: data.durationMinutes
+        });
+        
+        if (enforcementStarted) {
+          console.log('✅ Mobile enforcement started automatically for task:', data.title);
+        } else {
+          console.log('⚠️ Mobile enforcement failed to start for task:', data.title);
+        }
+      } catch (error) {
+        console.error('❌ Error starting mobile enforcement:', error);
+      }
       
       // Show toast notification
       toast({
@@ -77,7 +96,7 @@ export const useWebSocket = () => {
         socketRef.current.disconnect();
       }
     };
-  }, [toast, user?.id]);
+  }, [toast, user?.id, mobileEnforcement]);
 
   return {
     socket: socketRef.current,
