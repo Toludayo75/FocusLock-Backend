@@ -1,8 +1,18 @@
 import express from "express";
 import cors from "cors";
+import { createServer } from "http";
+import { Server } from "socket.io";
 import { registerRoutes } from "./routes.js";
+import { storage } from "./storage.js";
 
 const app = express();
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 
 // Middleware - Enhanced CORS for Replit environment
 app.use(cors({
@@ -40,8 +50,107 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   res.status(status).json({ message });
 });
 
+// Background Task Scheduler
+class TaskScheduler {
+  private intervalId: NodeJS.Timeout | null = null;
+  
+  start() {
+    console.log('Starting background task scheduler...');
+    
+    // Check for due tasks every 30 seconds
+    this.intervalId = setInterval(async () => {
+      try {
+        await this.checkAndStartDueTasks();
+      } catch (error) {
+        console.error('Error in background task scheduler:', error);
+      }
+    }, 30000); // 30 seconds
+    
+    // Run once immediately on startup
+    this.checkAndStartDueTasks();
+  }
+  
+  stop() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+      console.log('Background task scheduler stopped.');
+    }
+  }
+  
+  private async checkAndStartDueTasks() {
+    try {
+      const pendingTasks = await storage.getPendingTasksDueToStart();
+      
+      if (pendingTasks.length > 0) {
+        console.log(`Found ${pendingTasks.length} tasks ready to start`);
+        
+        for (const task of pendingTasks) {
+          // Update task status to ACTIVE
+          const updatedTask = await storage.updateTask(task.id, { status: 'ACTIVE' });
+          
+          if (updatedTask) {
+            console.log(`Auto-started task: ${task.title} (ID: ${task.id})`);
+            
+            // Emit WebSocket event to specific user only (security fix)
+            io.to(`user:${task.userId}`).emit('taskAutoStarted', {
+              taskId: task.id,
+              title: task.title,
+              strictLevel: task.strictLevel,
+              targetApps: task.targetApps,
+              durationMinutes: task.durationMinutes,
+              pdfFileUrl: task.pdfFileUrl
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error checking for due tasks:', error);
+    }
+  }
+}
+
+const taskScheduler = new TaskScheduler();
+
 // Start server
 const port = parseInt(process.env.BACKEND_PORT || '8000', 10);
-app.listen(port, '0.0.0.0', () => {
+server.listen(port, '0.0.0.0', () => {
   console.log(`Server running on port ${port}`);
+  
+  // Start background task scheduler
+  taskScheduler.start();
+});
+
+// Handle WebSocket connections
+io.on('connection', (socket) => {
+  console.log('Client connected to WebSocket');
+  
+  // Join user-specific room for secure messaging
+  socket.on('joinUserRoom', (userId: string) => {
+    socket.join(`user:${userId}`);
+    console.log(`Client joined room: user:${userId}`);
+  });
+  
+  socket.on('disconnect', () => {
+    console.log('Client disconnected from WebSocket');
+  });
+});
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+  console.log('Received SIGINT, shutting down gracefully...');
+  taskScheduler.stop();
+  server.close(() => {
+    console.log('Server closed.');
+    process.exit(0);
+  });
+});
+
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM, shutting down gracefully...');
+  taskScheduler.stop();
+  server.close(() => {
+    console.log('Server closed.');
+    process.exit(0);
+  });
 });
