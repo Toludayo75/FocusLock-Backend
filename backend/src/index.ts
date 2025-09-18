@@ -80,17 +80,17 @@ class TaskScheduler {
   
   private async checkAndStartDueTasks() {
     try {
+      console.log('Checking for due tasks...');
       const pendingTasks = await storage.getPendingTasksDueToStart();
+      console.log(`Found ${pendingTasks.length} pending tasks ready to start`);
       
       if (pendingTasks.length > 0) {
-        console.log(`Found ${pendingTasks.length} tasks ready to start`);
-        
         for (const task of pendingTasks) {
           // Update task status to ACTIVE
           const updatedTask = await storage.updateTask(task.id, { status: 'ACTIVE' });
           
           if (updatedTask) {
-            console.log(`Auto-started task: ${task.title} (ID: ${task.id})`);
+            console.log(`Auto-started task: ${task.title} (ID: ${task.id}) for user: ${task.userId}`);
             
             // Emit WebSocket event to specific user only (security fix)
             io.to(`user:${task.userId}`).emit('taskAutoStarted', {
@@ -101,6 +101,8 @@ class TaskScheduler {
               durationMinutes: task.durationMinutes,
               pdfFileUrl: task.pdfFileUrl
             });
+            
+            console.log(`Emitted taskAutoStarted event to user room: user:${task.userId}`);
           }
         }
       }
