@@ -1,7 +1,7 @@
 // Mobile Enforcement Hook for FocusLock
 // UNCOMMENT AND USE WHEN CONVERTING TO CAPACITOR + ANDROID
 
-// import { useDeviceAdmin } from '../../mobile/capacitor-device-admin';
+import { useDeviceAdmin } from '../../../mobile/capacitor-device-admin';
 import { useState, useEffect } from 'react';
 
 export interface EnforcementState {
@@ -19,30 +19,30 @@ export const useMobileEnforcement = () => {
     targetApps: []
   });
 
-  // UNCOMMENT WHEN CONVERTING TO CAPACITOR
-  // const deviceAdmin = useDeviceAdmin();
+  // Enable Capacitor device admin functionality
+  const deviceAdmin = useDeviceAdmin();
 
   const checkDeviceAdminStatus = async (): Promise<boolean> => {
-    // UNCOMMENT FOR CAPACITOR:
-    // if (deviceAdmin.isNativePlatform) {
-    //   const isActive = await deviceAdmin.checkDeviceAdminStatus();
-    //   setEnforcementState(prev => ({ ...prev, isDeviceAdminEnabled: isActive }));
-    //   return isActive;
-    // }
+    // MOBILE VERSION:
+    if (deviceAdmin.isNativePlatform) {
+      const isActive = await deviceAdmin.checkDeviceAdminStatus();
+      setEnforcementState(prev => ({ ...prev, isDeviceAdminEnabled: isActive }));
+      return isActive;
+    }
     
     // WEB VERSION: Always return false
     return false;
   };
 
   const requestDeviceAdminPermission = async (): Promise<boolean> => {
-    // UNCOMMENT FOR CAPACITOR:
-    // if (deviceAdmin.isNativePlatform) {
-    //   const granted = await deviceAdmin.requestDeviceAdminPermission();
-    //   if (granted) {
-    //     setEnforcementState(prev => ({ ...prev, isDeviceAdminEnabled: true }));
-    //   }
-    //   return granted;
-    // }
+    // MOBILE VERSION:
+    if (deviceAdmin.isNativePlatform) {
+      const granted = await deviceAdmin.requestDeviceAdminPermission();
+      if (granted) {
+        setEnforcementState(prev => ({ ...prev, isDeviceAdminEnabled: true }));
+      }
+      return granted;
+    }
     
     // WEB VERSION: Show info toast
     console.log('Device admin only available on mobile app');
@@ -54,28 +54,28 @@ export const useMobileEnforcement = () => {
     targetApps: string[];
     durationMinutes: number;
   }): Promise<boolean> => {
-    // UNCOMMENT FOR CAPACITOR:
-    // if (deviceAdmin.isNativePlatform) {
-    //   const isAdminActive = await checkDeviceAdminStatus();
-    //   if (!isAdminActive) {
-    //     const granted = await requestDeviceAdminPermission();
-    //     if (!granted) return false;
-    //   }
-    //   
-    //   setEnforcementState({
-    //     isActive: true,
-    //     isDeviceAdminEnabled: true,
-    //     strictLevel: taskData.strictLevel,
-    //     targetApps: taskData.targetApps
-    //   });
-    //   
-    //   // Disable camera for MEDIUM and HARD levels
-    //   if (taskData.strictLevel !== 'SOFT') {
-    //     await deviceAdmin.disableCamera(true);
-    //   }
-    //   
-    //   return true;
-    // }
+    // MOBILE VERSION:
+    if (deviceAdmin.isNativePlatform) {
+      const isAdminActive = await checkDeviceAdminStatus();
+      if (!isAdminActive) {
+        const granted = await requestDeviceAdminPermission();
+        if (!granted) return false;
+      }
+      
+      setEnforcementState({
+        isActive: true,
+        isDeviceAdminEnabled: true,
+        strictLevel: taskData.strictLevel,
+        targetApps: taskData.targetApps
+      });
+      
+      // Disable camera for MEDIUM and HARD levels
+      if (taskData.strictLevel !== 'SOFT') {
+        await deviceAdmin.disableCamera(true);
+      }
+      
+      return true;
+    }
 
     // WEB VERSION: Just update state for demo
     setEnforcementState({
@@ -90,11 +90,11 @@ export const useMobileEnforcement = () => {
   };
 
   const stopEnforcement = async (): Promise<void> => {
-    // UNCOMMENT FOR CAPACITOR:
-    // if (deviceAdmin.isNativePlatform && enforcementState.isDeviceAdminEnabled) {
-    //   // Re-enable camera
-    //   await deviceAdmin.disableCamera(false);
-    // }
+    // MOBILE VERSION:
+    if (deviceAdmin.isNativePlatform && enforcementState.isDeviceAdminEnabled) {
+      // Re-enable camera
+      await deviceAdmin.disableCamera(false);
+    }
 
     setEnforcementState(prev => ({ 
       ...prev, 
@@ -109,27 +109,27 @@ export const useMobileEnforcement = () => {
   const enforceRestriction = async (): Promise<void> => {
     if (!enforcementState.isActive) return;
 
-    // UNCOMMENT FOR CAPACITOR:
-    // if (deviceAdmin.isNativePlatform && enforcementState.isDeviceAdminEnabled) {
-    //   switch (enforcementState.strictLevel) {
-    //     case 'SOFT':
-    //       // Just show notification (handled by app)
-    //       break;
-    //     case 'MEDIUM':
-    //       // Lock device after 10 second grace period
-    //       setTimeout(async () => {
-    //         await deviceAdmin.lockDevice();
-    //       }, 10000);
-    //       break;
-    //     case 'HARD':
-    //       // Lock device immediately
-    //       await deviceAdmin.lockDevice();
-    //       break;
-    //   }
-    // } else {
+    // MOBILE VERSION:
+    if (deviceAdmin.isNativePlatform && enforcementState.isDeviceAdminEnabled) {
+      switch (enforcementState.strictLevel) {
+        case 'SOFT':
+          // Just show notification (handled by app)
+          break;
+        case 'MEDIUM':
+          // Lock device after 10 second grace period
+          setTimeout(async () => {
+            await deviceAdmin.lockDevice();
+          }, 10000);
+          break;
+        case 'HARD':
+          // Lock device immediately
+          await deviceAdmin.lockDevice();
+          break;
+      }
+    } else {
       // WEB VERSION: Show console message
       console.log(`Enforcement triggered: ${enforcementState.strictLevel} level`);
-    // }
+    }
   };
 
   useEffect(() => {
