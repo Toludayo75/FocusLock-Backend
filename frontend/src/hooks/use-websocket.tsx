@@ -10,10 +10,11 @@ export const useWebSocket = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    // Connect to WebSocket server using same origin to avoid CORS issues
-    const wsUrl = import.meta.env.VITE_WS_URL;
+    // Connect to WebSocket server using the Vite proxy setup
+    // The /socket.io path is proxied to the backend server
+    const wsUrl = import.meta.env.VITE_WS_URL || window.location.origin;
     
-    socketRef.current = io(wsUrl || undefined, {
+    socketRef.current = io(wsUrl, {
       autoConnect: true,
       reconnection: true,
       reconnectionAttempts: 5,
