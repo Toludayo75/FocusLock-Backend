@@ -8,7 +8,7 @@ import { Header } from "@/components/layout/header";
 import { BottomNavigation } from "@/components/layout/bottom-navigation";
 import { AddTaskModal } from "@/components/modals/add-task-modal";
 import { ConfirmationModal } from "@/components/modals/confirmation-modal";
-import { Task } from "@/types/task";
+import { Task } from "@/types/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useMobileEnforcement } from "@/hooks/use-mobile-enforcement";
