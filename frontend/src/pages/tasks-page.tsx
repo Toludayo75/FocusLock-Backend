@@ -11,6 +11,7 @@ import { ConfirmationModal } from "@/components/modals/confirmation-modal";
 import { Task } from "@/types/task";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useMobileEnforcement } from "@/hooks/use-mobile-enforcement";
 import { Plus, Edit, Trash2, Clock, Smartphone, ClipboardCheck } from "lucide-react";
 import { format } from "date-fns";
 
@@ -19,6 +20,7 @@ export default function TasksPage() {
   const [activeTab, setActiveTab] = useState("today");
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
   const { toast } = useToast();
+  const mobileEnforcement = useMobileEnforcement();
 
   const { data: tasks = [] } = useQuery<Task[]>({
     queryKey: ["/api/tasks"],
@@ -33,6 +35,48 @@ export default function TasksPage() {
       toast({
         title: "Task deleted",
         description: "Task has been deleted successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const startTaskMutation = useMutation({
+    mutationFn: async ({ taskId, taskData, pdfWindow }: { taskId: string, taskData: Task, pdfWindow?: Window | null }) => {
+      // Update status to ACTIVE
+      await apiRequest("PATCH", `/api/tasks/${taskId}`, { status: "ACTIVE" });
+      return { task: taskData, pdfWindow };
+    },
+    onSuccess: async ({ task: startedTask, pdfWindow }: { task: Task, pdfWindow?: Window | null }) => {
+      // 1. Open PDF if it exists
+      if (startedTask.pdfFileUrl && pdfWindow) {
+        pdfWindow.location.href = startedTask.pdfFileUrl;
+        console.log("📄 Opening PDF:", startedTask.pdfFileUrl);
+      }
+      
+      // 2. Start enforcement with task parameters
+      const enforcementStarted = await mobileEnforcement.startEnforcement({
+        strictLevel: startedTask.strictLevel,
+        targetApps: startedTask.targetApps,
+        durationMinutes: startedTask.durationMinutes
+      });
+      
+      if (enforcementStarted) {
+        console.log(`🔒 Enforcement started: ${startedTask.strictLevel} level for ${startedTask.durationMinutes} minutes`);
+      }
+      
+      // 3. Show success notification
+      queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
+      toast({
+        title: "Task started",
+        description: enforcementStarted ? 
+          (startedTask.pdfFileUrl ? "PDF opened and enforcement active!" : "Task active with enforcement!") :
+          (startedTask.pdfFileUrl ? "PDF opened (enforcement failed)" : "Task started (enforcement failed)")
       });
     },
     onError: (error: Error) => {
@@ -76,6 +120,12 @@ export default function TasksPage() {
 
   const handleDeleteTask = (taskId: string) => {
     setTaskToDelete(taskId);
+  };
+
+  const handleStartTask = (task: Task) => {
+    // Open PDF window synchronously to prevent popup blocking
+    const pdfWindow = task.pdfFileUrl ? window.open('about:blank', '_blank') : null;
+    startTaskMutation.mutate({ taskId: task.id, taskData: task, pdfWindow });
   };
 
   const confirmDelete = () => {
@@ -172,8 +222,14 @@ export default function TasksPage() {
                       </div>
                       
                       {task.status === 'PENDING' && (
-                        <Button size="sm" variant="secondary" data-testid={`button-start-${index}`}>
-                          Start Task
+                        <Button 
+                          size="sm" 
+                          variant="secondary" 
+                          onClick={() => handleStartTask(task)}
+                          disabled={startTaskMutation.isPending}
+                          data-testid={`button-start-${index}`}
+                        >
+                          {startTaskMutation.isPending ? "Starting..." : "Start Task"}
                         </Button>
                       )}
                     </div>
