@@ -1,3 +1,7 @@
+// ⚠️ DEPRECATED - DO NOT USE ⚠️
+// This file uses DevicePolicyManager which requires Device Owner privileges (factory reset)
+// Use capacitor-focus-guard.ts instead for consumer-safe enforcement
+
 // Capacitor Device Admin Integration
 // UNCOMMENT AND USE WHEN CONVERTING TO ANDROID
 

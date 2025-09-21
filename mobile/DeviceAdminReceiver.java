@@ -1,3 +1,7 @@
+// ⚠️ DEPRECATED - DO NOT USE ⚠️
+// This file uses DevicePolicyManager which requires Device Owner privileges (factory reset)
+// Use FocusGuardService.java instead for consumer-safe enforcement with Accessibility + Overlay
+
 // COPY THIS FILE TO: android/app/src/main/java/[your-package]/DeviceAdminReceiver.java
 // REPLACE [your-package] with your actual package name (e.g., com.focuslock.app)
 
