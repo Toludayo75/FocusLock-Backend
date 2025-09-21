@@ -1,0 +1,930 @@
+Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+firebase.ts:40 Firebase configuration not available. Push notifications will be disabled.
+initializeFirebase @ firebase.ts:40Understand this warning
+favicon.ico:1  Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123Understand this warning
+45WebSocket connection to '<URL>' failed: WebSocket is closed before the connection is established.Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
+use-websocket.tsx:123 ⚠️ Push notifications not available - relying solely on HTTP polling
+(anonymous) @ use-websocket.tsx:123
+(anonymous) @ use-websocket.tsx:192
+Emitter.emit @ socket__io-client.js?v=d321a10d:354
+onclose @ socket__io-client.js?v=d321a10d:2573
+disconnect @ socket__io-client.js?v=d321a10d:2769
+(anonymous) @ use-websocket.tsx:225
+safelyCallDestroy @ chunk-RPCDYKBN.js?v=d321a10d:16748
+commitHookEffectListUnmount @ chunk-RPCDYKBN.js?v=d321a10d:16875
+commitPassiveUnmountOnFiber @ chunk-RPCDYKBN.js?v=d321a10d:18232
+commitPassiveUnmountEffects_complete @ chunk-RPCDYKBN.js?v=d321a10d:18213
+commitPassiveUnmountEffects_begin @ chunk-RPCDYKBN.js?v=d321a10d:18204
+commitPassiveUnmountEffects @ chunk-RPCDYKBN.js?v=d321a10d:18169
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=d321a10d:19489
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=d321a10d:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=d321a10d:19328
+workLoop @ chunk-RPCDYKBN.js?v=d321a10d:197
+flushWork @ chunk-RPCDYKBN.js?v=d321a10d:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=d321a10d:384Understand this warning
+use-websocket.tsx:170 ✅ Connected to WebSocket server
+use-websocket.tsx:182 Joined user room: 641df867-9f2c-4a41-a445-89b7726c6bd7
+use-websocket.tsx:187 ❌ Disconnected from WebSocket server: io client disconnect
+use-websocket.tsx:117 🔄 Starting HTTP polling fallback (WebSocket disconnected)...
