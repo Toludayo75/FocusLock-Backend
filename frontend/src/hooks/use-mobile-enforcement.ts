@@ -1,12 +1,12 @@
 // Mobile Enforcement Hook for FocusLock
-// UNCOMMENT AND USE WHEN CONVERTING TO CAPACITOR + ANDROID
+// Updated to use FocusGuard (Consumer-Safe Enforcement)
 
-import { useDeviceAdmin } from '../../../mobile/capacitor-device-admin';
+import { useFocusGuard } from '../../../mobile/capacitor-focus-guard';
 import { useState, useEffect } from 'react';
 
 export interface EnforcementState {
   isActive: boolean;
-  isDeviceAdminEnabled: boolean;
+  isDeviceAdminEnabled: boolean; // Renamed but kept for backward compatibility - now means "FocusGuard permissions enabled"
   strictLevel: 'SOFT' | 'MEDIUM' | 'HARD';
   targetApps: string[];
   blockedApps: string[];
@@ -23,15 +23,17 @@ export const useMobileEnforcement = () => {
     currentApp: null
   });
 
-  // Enable Capacitor device admin functionality
-  const deviceAdmin = useDeviceAdmin();
+  // Enable FocusGuard consumer-safe enforcement
+  const focusGuard = useFocusGuard();
 
   const checkDeviceAdminStatus = async (): Promise<boolean> => {
     // MOBILE VERSION:
-    if (deviceAdmin.isNativePlatform) {
-      const isActive = await deviceAdmin.checkDeviceAdminStatus();
-      setEnforcementState(prev => ({ ...prev, isDeviceAdminEnabled: isActive }));
-      return isActive;
+    if (focusGuard.isNativePlatform) {
+      const permissions = await focusGuard.checkPermissions();
+      // Consider enforcement enabled if we have the core permissions
+      const isEnabled = permissions.accessibility && permissions.overlay && permissions.usageAccess;
+      setEnforcementState(prev => ({ ...prev, isDeviceAdminEnabled: isEnabled }));
+      return isEnabled;
     }
     
     // WEB VERSION: Always return false
@@ -40,8 +42,8 @@ export const useMobileEnforcement = () => {
 
   const requestDeviceAdminPermission = async (): Promise<boolean> => {
     // MOBILE VERSION:
-    if (deviceAdmin.isNativePlatform) {
-      const granted = await deviceAdmin.requestDeviceAdminPermission();
+    if (focusGuard.isNativePlatform) {
+      const granted = await focusGuard.requestAllPermissions();
       if (granted) {
         setEnforcementState(prev => ({ ...prev, isDeviceAdminEnabled: true }));
       }
@@ -49,7 +51,7 @@ export const useMobileEnforcement = () => {
     }
     
     // WEB VERSION: Show info toast
-    console.log('Device admin only available on mobile app');
+    console.log('FocusGuard only available on mobile app');
     return false;
   };
 
@@ -59,41 +61,36 @@ export const useMobileEnforcement = () => {
     durationMinutes: number;
   }): Promise<boolean> => {
     // MOBILE VERSION:
-    if (deviceAdmin.isNativePlatform) {
-      const isAdminActive = await checkDeviceAdminStatus();
-      if (!isAdminActive) {
+    if (focusGuard.isNativePlatform) {
+      const isPermissionsActive = await checkDeviceAdminStatus();
+      if (!isPermissionsActive) {
         const granted = await requestDeviceAdminPermission();
         if (!granted) return false;
       }
       
-      // 🚀 NEW: Set up app restrictions
-      const restrictionSuccess = await deviceAdmin.setAppUsageRestrictions(
-        taskData.targetApps, 
-        taskData.strictLevel
-      );
+      // 🚀 NEW: Start FocusGuard session (replaces individual app blocking)
+      const sessionId = await focusGuard.startEnforcementSession({
+        allowedApps: taskData.targetApps,
+        strictLevel: taskData.strictLevel,
+        durationMinutes: taskData.durationMinutes
+      });
       
-      if (!restrictionSuccess) {
-        console.log('Failed to set app restrictions');
+      if (!sessionId) {
+        console.log('Failed to start enforcement session');
         return false;
       }
       
-      // Get all installed apps to determine which ones to block
-      const installedApps = await deviceAdmin.getInstalledApps();
+      // Get all installed apps to compute which ones will be blocked (for UI state only)
+      const installedApps = await focusGuard.getInstalledApps();
       const appsToBlock = installedApps
         .filter(app => !taskData.targetApps.includes(app.packageName))
         .map(app => app.packageName);
       
-      // Block non-target apps based on strict level
+      // Filter out system apps that shouldn't be blocked (for UI state)
       const blockedApps: string[] = [];
-      if (taskData.strictLevel !== 'SOFT') {
-        for (const packageName of appsToBlock) {
-          // Skip system apps that shouldn't be blocked
-          if (!isSystemApp(packageName)) {
-            const blocked = await deviceAdmin.setAppBlocked(packageName, true);
-            if (blocked) {
-              blockedApps.push(packageName);
-            }
-          }
+      for (const packageName of appsToBlock) {
+        if (!isSystemApp(packageName)) {
+          blockedApps.push(packageName);
         }
       }
       
@@ -102,19 +99,15 @@ export const useMobileEnforcement = () => {
         isDeviceAdminEnabled: true,
         strictLevel: taskData.strictLevel,
         targetApps: taskData.targetApps,
-        blockedApps,
+        blockedApps, // For UI only - actual blocking handled by FocusGuard
         currentApp: null
       });
       
-      // Disable camera for MEDIUM and HARD levels
-      if (taskData.strictLevel !== 'SOFT') {
-        await deviceAdmin.disableCamera(true);
-      }
+      // Start background monitoring (replaces manual app monitoring)
+      await focusGuard.startBackgroundMonitoring();
       
-      // Start monitoring current app
-      startAppMonitoring();
-      
-      console.log(`✅ Enforcement started: ${blockedApps.length} apps blocked, ${taskData.targetApps.length} apps allowed`);
+      console.log(`✅ FocusGuard session started: ${blockedApps.length} apps will be blocked, ${taskData.targetApps.length} apps allowed`);
+      console.log(`Session ID: ${sessionId}`);
       return true;
     }
 
@@ -134,17 +127,15 @@ export const useMobileEnforcement = () => {
 
   const stopEnforcement = async (): Promise<void> => {
     // MOBILE VERSION:
-    if (deviceAdmin.isNativePlatform && enforcementState.isDeviceAdminEnabled) {
-      // 🚀 NEW: Unblock all previously blocked apps
-      for (const packageName of enforcementState.blockedApps) {
-        await deviceAdmin.setAppBlocked(packageName, false);
-      }
+    if (focusGuard.isNativePlatform && enforcementState.isDeviceAdminEnabled) {
+      // 🚀 NEW: Stop FocusGuard session (automatically unblocks all apps)
+      await focusGuard.stopEnforcementSession();
       
-      // Re-enable camera
-      await deviceAdmin.disableCamera(false);
+      // Stop background monitoring
+      await focusGuard.stopBackgroundMonitoring();
       
-      // Stop app monitoring
-      stopAppMonitoring();
+      // Hide any active overlays
+      await focusGuard.hideAppBlockOverlay();
     }
 
     setEnforcementState(prev => ({ 
@@ -156,36 +147,35 @@ export const useMobileEnforcement = () => {
       currentApp: null
     }));
     
-    console.log('Enforcement stopped - all apps unblocked');
+    console.log('FocusGuard session stopped - all apps unblocked');
   };
 
   const enforceRestriction = async (): Promise<void> => {
     if (!enforcementState.isActive) return;
 
     // MOBILE VERSION:
-    if (deviceAdmin.isNativePlatform && enforcementState.isDeviceAdminEnabled) {
-      const currentApp = await deviceAdmin.getCurrentRunningApp();
+    if (focusGuard.isNativePlatform && enforcementState.isDeviceAdminEnabled) {
+      const currentApp = await focusGuard.getCurrentRunningApp();
       
-      // Check if current app is blocked
+      // Check if current app is blocked (Note: FocusGuard handles automatic enforcement,
+      // this is mainly for UI state updates and additional logging)
       if (currentApp && enforcementState.blockedApps.includes(currentApp)) {
         console.log(`🚫 Blocked app detected: ${currentApp}`);
         
+        // FocusGuard's AccessibilityService handles the actual enforcement automatically
+        // We can still show overlays or perform additional actions here if needed
         switch (enforcementState.strictLevel) {
           case 'SOFT':
-            // Show notification but don't lock (handled by app UI)
-            console.log('⚠️ Soft restriction: Please return to allowed apps');
+            console.log('⚠️ Soft restriction: Overlay shown, user can dismiss');
+            await focusGuard.showAppBlockOverlay(currentApp, true);
             break;
           case 'MEDIUM':
-            // Lock device after 10 second grace period
-            console.log('⏰ Medium restriction: 10 seconds to switch apps');
-            setTimeout(async () => {
-              await deviceAdmin.lockDevice();
-            }, 10000);
+            console.log('⏰ Medium restriction: Grace period then home action');
+            await focusGuard.showAppBlockOverlay(currentApp, false);
             break;
           case 'HARD':
-            // Lock device immediately
-            console.log('🔒 Hard restriction: Device locked immediately');
-            await deviceAdmin.lockDevice();
+            console.log('🔒 Hard restriction: Immediate home action');
+            await focusGuard.performHomeAction();
             break;
         }
       }
@@ -199,29 +189,30 @@ export const useMobileEnforcement = () => {
   let monitoringInterval: NodeJS.Timeout | null = null;
 
   const startAppMonitoring = () => {
-    if (!deviceAdmin.isNativePlatform) return;
+    if (!focusGuard.isNativePlatform) return;
     
-    // Monitor current app every 2 seconds
+    // Note: FocusGuard handles automatic monitoring via AccessibilityService
+    // This manual monitoring is mainly for UI state updates
     monitoringInterval = setInterval(async () => {
-      const currentApp = await deviceAdmin.getCurrentRunningApp();
+      const currentApp = await focusGuard.getCurrentRunningApp();
       
       setEnforcementState(prev => ({
         ...prev,
         currentApp
       }));
       
-      // Trigger enforcement if needed
+      // Optional: Additional enforcement logic (FocusGuard handles core enforcement)
       await enforceRestriction();
     }, 2000);
     
-    console.log('📱 App monitoring started');
+    console.log('📱 Manual app monitoring started (FocusGuard handles automatic enforcement)');
   };
 
   const stopAppMonitoring = () => {
     if (monitoringInterval) {
       clearInterval(monitoringInterval);
       monitoringInterval = null;
-      console.log('📱 App monitoring stopped');
+      console.log('📱 Manual app monitoring stopped');
     }
   };
 
