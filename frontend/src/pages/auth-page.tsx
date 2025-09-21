@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StrictModeAgreement } from "@/components/modals/strict-mode-agreement";
 import { WelcomeFlow } from "@/components/onboarding/welcome-flow";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
@@ -14,6 +15,7 @@ export default function AuthPage() {
   const [showOnboarding, setShowOnboarding] = useState(true);
   const [isLogin, setIsLogin] = useState(true);
   const [showStrictMode, setShowStrictMode] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -117,15 +119,32 @@ export default function AuthPage() {
                 
                 <div>
                   <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder={isLogin ? "Enter your password" : "Create a strong password"}
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    required
-                    data-testid="input-password"
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder={isLogin ? "Enter your password" : "Create a strong password"}
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      required
+                      data-testid="input-password"
+                      className="pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowPassword(!showPassword)}
+                      data-testid="button-toggle-password"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
                 
                 <Button 
