@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,13 +20,17 @@ import {
   ChevronRight,
   ArrowLeft,
   Camera,
-  Save
+  Save,
+  AlertCircle,
+  CheckCircle,
+  Smartphone
 } from "lucide-react";
 
 type SettingsView = 'main' | 'profile' | 'notifications' | 'focus' | 'integrations' | 'accountability';
 
 export default function SettingsPage() {
   const { user, logoutMutation } = useAuth();
+  const pushNotifications = usePushNotifications();
   const [currentView, setCurrentView] = useState<SettingsView>('main');
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [strictModeEnabled, setStrictModeEnabled] = useState(true);
@@ -219,6 +224,176 @@ export default function SettingsPage() {
                     ⚠️ Enabling this feature will require a 24-hour cooldown period before you can uninstall FocusLock.
                   </p>
                 </div>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+        <BottomNavigation currentTab="settings" />
+      </div>
+    );
+  }
+
+  if (currentView === 'notifications') {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="flex-1 pb-20 max-w-2xl mx-auto px-4 py-6">
+          {renderBackButton()}
+          <h1 className="text-2xl font-bold mb-6">Notifications</h1>
+          
+          <div className="space-y-6">
+            {/* Push Notifications */}
+            <Card data-testid="push-notifications-section">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <Smartphone className="w-5 h-5 text-primary" />
+                    <div>
+                      <h3 className="font-semibold">Push Notifications</h3>
+                      <p className="text-sm text-muted-foreground">Get alerts when tasks start and for focus violations</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    {pushNotifications.isEnabled ? (
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                    ) : pushNotifications.permission === 'denied' ? (
+                      <AlertCircle className="w-5 h-5 text-destructive" />
+                    ) : (
+                      <Bell className="w-5 h-5 text-muted-foreground" />
+                    )}
+                  </div>
+                </div>
+
+                {/* Status indicator */}
+                <div className="mb-4">
+                  {pushNotifications.isLoading ? (
+                    <div className="bg-muted p-3 rounded-md">
+                      <p className="text-sm">Setting up push notifications...</p>
+                    </div>
+                  ) : pushNotifications.isEnabled ? (
+                    <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-md border border-green-200 dark:border-green-800">
+                      <p className="text-sm text-green-700 dark:text-green-300">
+                        ✅ Push notifications are enabled. You'll receive alerts for task auto-starts and focus violations.
+                      </p>
+                    </div>
+                  ) : pushNotifications.permission === 'denied' ? (
+                    <div className="bg-destructive/10 p-3 rounded-md border border-destructive/20">
+                      <p className="text-sm text-destructive">
+                        ❌ Notifications blocked. Please enable them in your browser settings to receive push alerts.
+                      </p>
+                    </div>
+                  ) : !pushNotifications.isSupported ? (
+                    <div className="bg-muted p-3 rounded-md">
+                      <p className="text-sm text-muted-foreground">
+                        ⚠️ Push notifications are not supported in this browser.
+                      </p>
+                    </div>
+                  ) : pushNotifications.error ? (
+                    <div className="bg-destructive/10 p-3 rounded-md border border-destructive/20">
+                      <p className="text-sm text-destructive">
+                        ❌ {pushNotifications.error}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="bg-muted p-3 rounded-md">
+                      <p className="text-sm text-muted-foreground">
+                        📱 Enable push notifications to get alerts when tasks auto-start and when you try to break focus rules.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex gap-3">
+                  {pushNotifications.isEnabled ? (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={pushNotifications.testNotification}
+                        data-testid="button-test-notification"
+                      >
+                        Test Notification
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={pushNotifications.disableNotifications}
+                        disabled={pushNotifications.isLoading}
+                        data-testid="button-disable-notifications"
+                      >
+                        Disable
+                      </Button>
+                    </>
+                  ) : pushNotifications.isSupported && pushNotifications.permission !== 'denied' ? (
+                    <Button
+                      onClick={pushNotifications.requestPermission}
+                      disabled={pushNotifications.isLoading}
+                      data-testid="button-enable-notifications"
+                    >
+                      {pushNotifications.isLoading ? 'Setting up...' : 'Enable Push Notifications'}
+                    </Button>
+                  ) : null}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Separator />
+
+            {/* Traditional Notification Settings */}
+            <Card data-testid="notification-preferences-section">
+              <CardContent className="p-6">
+                <h3 className="font-semibold mb-4">Notification Preferences</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="font-medium">Task Reminders</label>
+                      <p className="text-sm text-muted-foreground">Get notified before tasks start</p>
+                    </div>
+                    <Switch
+                      checked={notificationSettings.taskReminders}
+                      onCheckedChange={(checked) =>
+                        setNotificationSettings(prev => ({ ...prev, taskReminders: checked }))
+                      }
+                      data-testid="switch-task-reminders"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="font-medium">Streak Updates</label>
+                      <p className="text-sm text-muted-foreground">Celebrate your productivity milestones</p>
+                    </div>
+                    <Switch
+                      checked={notificationSettings.streakUpdates}
+                      onCheckedChange={(checked) =>
+                        setNotificationSettings(prev => ({ ...prev, streakUpdates: checked }))
+                      }
+                      data-testid="switch-streak-updates"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="font-medium">Accountability Alerts</label>
+                      <p className="text-sm text-muted-foreground">Notifications from accountability partners</p>
+                    </div>
+                    <Switch
+                      checked={notificationSettings.accountabilityAlerts}
+                      onCheckedChange={(checked) =>
+                        setNotificationSettings(prev => ({ ...prev, accountabilityAlerts: checked }))
+                      }
+                      data-testid="switch-accountability-alerts"
+                    />
+                  </div>
+                </div>
+
+                <Separator className="my-6" />
+
+                <Button className="w-full" data-testid="button-save-notifications">
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Changes
+                </Button>
               </CardContent>
             </Card>
           </div>
