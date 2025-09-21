@@ -11,7 +11,12 @@ const io = new Server(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"]
-  }
+  },
+  // Mobile-optimized settings for reliability
+  pingTimeout: 60000, // 1 minute
+  pingInterval: 25000, // 25 seconds
+  transports: ['websocket', 'polling'],
+  allowEIO3: true
 });
 
 // Middleware - Enhanced CORS for Replit environment
@@ -96,6 +101,7 @@ class TaskScheduler {
             io.to(`user:${task.userId}`).emit('taskAutoStarted', {
               taskId: task.id,
               title: task.title,
+              userId: task.userId, // FIXED: Include userId for frontend
               strictLevel: task.strictLevel,
               targetApps: task.targetApps,
               durationMinutes: task.durationMinutes,
@@ -125,16 +131,20 @@ server.listen(port, '0.0.0.0', () => {
 
 // Handle WebSocket connections
 io.on('connection', (socket) => {
-  console.log('Client connected to WebSocket');
+  console.log('Client connected to WebSocket:', socket.id);
   
   // Join user-specific room for secure messaging
   socket.on('joinUserRoom', (userId: string) => {
     socket.join(`user:${userId}`);
-    console.log(`Client joined room: user:${userId}`);
+    console.log(`Client ${socket.id} joined room: user:${userId}`);
   });
   
-  socket.on('disconnect', () => {
-    console.log('Client disconnected from WebSocket');
+  socket.on('disconnect', (reason) => {
+    console.log('Client disconnected from WebSocket:', socket.id, 'Reason:', reason);
+  });
+  
+  socket.on('error', (error) => {
+    console.error('WebSocket error for client:', socket.id, error);
   });
 });
 

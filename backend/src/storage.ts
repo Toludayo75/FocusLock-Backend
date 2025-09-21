@@ -17,6 +17,7 @@ export interface IStorage {
   
   // Task methods
   getTasksByUser(userId: string, range?: string): Promise<Task[]>;
+  getActiveTasksByUser(userId: string): Promise<Task[]>;
   createTask(insertTask: InsertTask): Promise<Task>;
   updateTask(id: string, updates: Partial<Task>): Promise<Task | undefined>;
   deleteTask(id: string, userId: string): Promise<boolean>;
@@ -89,6 +90,17 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(tasks)
       .where(whereCondition)
+      .orderBy(desc(tasks.startAt));
+  }
+
+  async getActiveTasksByUser(userId: string): Promise<Task[]> {
+    return await db
+      .select()
+      .from(tasks)
+      .where(and(
+        eq(tasks.userId, userId),
+        eq(tasks.status, 'ACTIVE')
+      ))
       .orderBy(desc(tasks.startAt));
   }
 

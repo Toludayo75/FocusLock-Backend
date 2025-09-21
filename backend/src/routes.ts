@@ -29,10 +29,30 @@ declare global {
 }
 
 export function registerRoutes(app: Express): void {
+  // Health check endpoint for WebSocket fallback
+  app.get("/healthz", (req, res) => {
+    res.json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
   // Setup authentication routes
   setupAuth(app);
 
   // Task routes
+  // Get active tasks for current user (HTTP polling fallback)
+  app.get("/api/tasks/active", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      const activeTasks = await storage.getActiveTasksByUser(req.user!.id);
+      res.json(activeTasks);
+    } catch (error) {
+      console.error("Error fetching active tasks:", error);
+      res.status(500).json({ message: "Failed to fetch active tasks" });
+    }
+  });
+
   app.get("/api/tasks/today", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Unauthorized" });
