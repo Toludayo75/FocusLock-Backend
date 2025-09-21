@@ -70,6 +70,86 @@ public class DeviceAdminPlugin extends Plugin {
             call.resolve(ret);
         }
     }
+
+    // 🚀 NEW: App Management Methods
+    @PluginMethod
+    public void getInstalledApps(PluginCall call) {
+        try {
+            JSArray apps = DeviceAdminReceiver.getInstalledApps(getContext());
+            JSObject ret = new JSObject();
+            ret.put("apps", apps);
+            call.resolve(ret);
+        } catch (Exception e) {
+            JSObject ret = new JSObject();
+            ret.put("apps", new JSArray());
+            call.resolve(ret);
+        }
+    }
+
+    @PluginMethod
+    public void setAppBlocked(PluginCall call) {
+        String packageName = call.getString("packageName");
+        boolean blocked = call.getBoolean("blocked", false);
+        try {
+            boolean success = DeviceAdminReceiver.setAppBlocked(getContext(), packageName, blocked);
+            JSObject ret = new JSObject();
+            ret.put("success", success);
+            call.resolve(ret);
+        } catch (Exception e) {
+            JSObject ret = new JSObject();
+            ret.put("success", false);
+            call.resolve(ret);
+        }
+    }
+
+    @PluginMethod
+    public void isAppBlocked(PluginCall call) {
+        String packageName = call.getString("packageName");
+        try {
+            boolean blocked = DeviceAdminReceiver.isAppBlocked(getContext(), packageName);
+            JSObject ret = new JSObject();
+            ret.put("blocked", blocked);
+            call.resolve(ret);
+        } catch (Exception e) {
+            JSObject ret = new JSObject();
+            ret.put("blocked", false);
+            call.resolve(ret);
+        }
+    }
+
+    @PluginMethod
+    public void getCurrentRunningApp(PluginCall call) {
+        try {
+            String packageName = DeviceAdminReceiver.getCurrentRunningApp(getContext());
+            JSObject ret = new JSObject();
+            ret.put("packageName", packageName);
+            call.resolve(ret);
+        } catch (Exception e) {
+            JSObject ret = new JSObject();
+            ret.put("packageName", null);
+            call.resolve(ret);
+        }
+    }
+
+    @PluginMethod
+    public void setAppUsageRestrictions(PluginCall call) {
+        JSArray allowedApps = call.getArray("allowedApps");
+        String strictLevel = call.getString("strictLevel");
+        try {
+            boolean success = DeviceAdminReceiver.setAppUsageRestrictions(
+                getContext(), 
+                allowedApps, 
+                strictLevel
+            );
+            JSObject ret = new JSObject();
+            ret.put("success", success);
+            call.resolve(ret);
+        } catch (Exception e) {
+            JSObject ret = new JSObject();
+            ret.put("success", false);
+            call.resolve(ret);
+        }
+    }
 }
 
 ========== REGISTER IN MainActivity.java ==========

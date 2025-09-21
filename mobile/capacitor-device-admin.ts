@@ -9,6 +9,16 @@ export interface DeviceAdminPlugin {
   requestDeviceAdmin(): Promise<{ granted: boolean }>;
   lockDevice(): Promise<{ success: boolean }>;
   setCameraDisabled(options: { disabled: boolean }): Promise<{ success: boolean }>;
+  
+  // 🚀 NEW: App Management Functions
+  getInstalledApps(): Promise<{ apps: Array<{ packageName: string; appName: string; }> }>;
+  setAppBlocked(options: { packageName: string; blocked: boolean }): Promise<{ success: boolean }>;
+  isAppBlocked(options: { packageName: string }): Promise<{ blocked: boolean }>;
+  getCurrentRunningApp(): Promise<{ packageName: string | null }>;
+  setAppUsageRestrictions(options: { 
+    allowedApps: string[]; 
+    strictLevel: 'SOFT' | 'MEDIUM' | 'HARD';
+  }): Promise<{ success: boolean }>;
 }
 
 // Custom Capacitor Plugin for Device Admin
@@ -82,11 +92,96 @@ export const useDeviceAdmin = () => {
     }
   };
 
+  // 🚀 NEW: App Management Functions
+  const getInstalledApps = async (): Promise<Array<{ packageName: string; appName: string; }>> => {
+    if (!isNativePlatform) return [];
+
+    try {
+      const result = await DeviceAdmin.getInstalledApps();
+      return result.apps;
+    } catch (error) {
+      console.log('Get installed apps failed:', error);
+      return [];
+    }
+  };
+
+  const setAppBlocked = async (packageName: string, blocked: boolean): Promise<boolean> => {
+    if (!isNativePlatform) return false;
+
+    try {
+      const isActive = await checkDeviceAdminStatus();
+      if (!isActive) {
+        console.log('Device admin not active - cannot block apps');
+        return false;
+      }
+
+      const result = await DeviceAdmin.setAppBlocked({ packageName, blocked });
+      return result.success;
+    } catch (error) {
+      console.log('App blocking failed:', error);
+      return false;
+    }
+  };
+
+  const isAppBlocked = async (packageName: string): Promise<boolean> => {
+    if (!isNativePlatform) return false;
+
+    try {
+      const result = await DeviceAdmin.isAppBlocked({ packageName });
+      return result.blocked;
+    } catch (error) {
+      console.log('Check app block status failed:', error);
+      return false;
+    }
+  };
+
+  const getCurrentRunningApp = async (): Promise<string | null> => {
+    if (!isNativePlatform) return null;
+
+    try {
+      const result = await DeviceAdmin.getCurrentRunningApp();
+      return result.packageName;
+    } catch (error) {
+      console.log('Get current app failed:', error);
+      return null;
+    }
+  };
+
+  const setAppUsageRestrictions = async (
+    allowedApps: string[], 
+    strictLevel: 'SOFT' | 'MEDIUM' | 'HARD'
+  ): Promise<boolean> => {
+    if (!isNativePlatform) return false;
+
+    try {
+      const isActive = await checkDeviceAdminStatus();
+      if (!isActive) {
+        console.log('Device admin not active - cannot set restrictions');
+        return false;
+      }
+
+      const result = await DeviceAdmin.setAppUsageRestrictions({ 
+        allowedApps, 
+        strictLevel 
+      });
+      return result.success;
+    } catch (error) {
+      console.log('Set app restrictions failed:', error);
+      return false;
+    }
+  };
+
   return {
     isNativePlatform,
     checkDeviceAdminStatus,
     requestDeviceAdminPermission,
     lockDevice,
-    disableCamera
+    disableCamera,
+    // 🚀 NEW: App Management
+    getInstalledApps,
+    setAppBlocked,
+    isAppBlocked,
+    getCurrentRunningApp,
+    setAppUsageRestrictions
   };
 };
