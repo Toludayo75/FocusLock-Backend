@@ -4,12 +4,12 @@ importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compa
 
 // Initialize Firebase in service worker
 firebase.initializeApp({
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN", 
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBL7YSiP1kx-E7O5_tmuZ2s4vtCecu5Gd4",
+  authDomain: "focuslock-9195a.firebaseapp.com",
+  projectId: "focuslock-9195a",
+  storageBucket: "focuslock-9195a.firebasestorage.app",
+  messagingSenderId: "1055023421536",
+  appId: "1:1055023421536:web:2c94781907851faf49cb05"
 });
 
 const messaging = firebase.messaging();

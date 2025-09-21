@@ -33,7 +33,7 @@ class FirebaseService {
   private initializeFirebase() {
     try {
       // Check if Firebase is already initialized
-      if (admin.apps.length > 0) {
+      if (admin.apps && admin.apps.length > 0) {
         this.isInitialized = true;
         console.log('Firebase Admin already initialized');
         return;
