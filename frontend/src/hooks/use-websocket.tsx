@@ -5,18 +5,20 @@ import { useToast } from './use-toast';
 import { useAuth } from './use-auth';
 import { useMobileEnforcement } from './use-mobile-enforcement';
 import { apiRequest } from '../lib/queryClient';
+import { firebaseNotificationService } from '../lib/firebase';
 
 export const useWebSocket = () => {
   const socketRef = useRef<Socket | null>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastSeenTasksRef = useRef<Set<string>>(new Set());
+  const wsFailureCountRef = useRef<number>(0);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [wsConnected, setWsConnected] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
   const mobileEnforcement = useMobileEnforcement();
 
-  // Unified task auto-start handler
+  // Enhanced task auto-start handler with push notification logging
   const handleTaskAutoStart = useCallback(async (data: {
     taskId: string;
     title: string;
@@ -25,14 +27,23 @@ export const useWebSocket = () => {
     targetApps: string[];
     durationMinutes: number;
     pdfFileUrl: string | null;
-  }) => {
+  }, source: 'websocket' | 'polling' = 'websocket') => {
     // Prevent duplicate triggers
     if (lastSeenTasksRef.current.has(data.taskId)) {
       return;
     }
     lastSeenTasksRef.current.add(data.taskId);
 
-    console.log('🎯 Processing task auto-start:', data.title);
+    console.log(`🎯 Processing task auto-start via ${source}:`, data.title);
+    
+    // If task detected via HTTP polling (WebSocket failure), note it for push notification reliability
+    if (source === 'polling') {
+      console.log('📱 Task detected via HTTP polling - WebSocket backup working');
+      wsFailureCountRef.current += 1;
+    } else if (source === 'websocket') {
+      // Reset failure count on successful WebSocket detection
+      wsFailureCountRef.current = 0;
+    }
     
     // Invalidate tasks query to refresh the UI
     queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
@@ -54,10 +65,10 @@ export const useWebSocket = () => {
       console.error('❌ Error starting mobile enforcement:', error);
     }
     
-    // Show toast notification
+    // Show toast notification with source indicator
     toast({
       title: "Task Started Automatically",
-      description: `"${data.title}" has started and enforcement is now active`,
+      description: `"${data.title}" has started and enforcement is now active ${source === 'polling' ? '(via backup system)' : ''}`,
       duration: 5000,
     });
 
@@ -91,7 +102,7 @@ export const useWebSocket = () => {
             targetApps: task.targetApps,
             durationMinutes: task.durationMinutes,
             pdfFileUrl: task.pdfFileUrl
-          });
+          }, 'polling'); // Mark as polling source for tracking
         }
       }
     } catch (error) {
@@ -99,11 +110,18 @@ export const useWebSocket = () => {
     }
   }, [user?.id, handleTaskAutoStart]);
 
-  // HTTP polling fallback for when WebSocket is down
+  // Enhanced HTTP polling fallback with push notification awareness
   const startHttpPolling = useCallback(() => {
     if (pollingIntervalRef.current) return; // Already polling
 
-    console.log('🔄 Starting HTTP polling fallback...');
+    console.log('🔄 Starting HTTP polling fallback (WebSocket disconnected)...');
+    
+    // Note WebSocket failure for push notification reliability tracking
+    if (firebaseNotificationService.isReady()) {
+      console.log('📱 Push notifications available as additional backup layer');
+    } else {
+      console.warn('⚠️ Push notifications not available - relying solely on HTTP polling');
+    }
     
     pollingIntervalRef.current = setInterval(async () => {
       if (!user?.id || wsConnected) {
@@ -111,10 +129,15 @@ export const useWebSocket = () => {
         if (pollingIntervalRef.current) {
           clearInterval(pollingIntervalRef.current);
           pollingIntervalRef.current = null;
+          
+          if (wsConnected) {
+            console.log('✅ WebSocket reconnected - stopping HTTP polling');
+          }
         }
         return;
       }
 
+      console.log('🔍 HTTP polling check (WebSocket down)...');
       await checkForActiveTasks();
     }, 15000); // Check every 15 seconds
     
