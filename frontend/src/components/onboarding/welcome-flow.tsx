@@ -43,6 +43,7 @@ export function WelcomeFlow({ onComplete }: WelcomeFlowProps) {
     if (currentScreen < screens.length - 1) {
       setCurrentScreen(currentScreen + 1);
     } else {
+      localStorage.setItem('focuslock_onboarding_completed', 'true');
       onComplete();
     }
   };
@@ -105,7 +106,10 @@ export function WelcomeFlow({ onComplete }: WelcomeFlowProps) {
         </div>
         <Button 
           variant="ghost" 
-          onClick={onComplete}
+          onClick={() => {
+            localStorage.setItem('focuslock_onboarding_completed', 'true');
+            onComplete();
+          }}
           className="text-muted-foreground"
           data-testid="button-skip"
         >

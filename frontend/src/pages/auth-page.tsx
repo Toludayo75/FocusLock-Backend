@@ -12,7 +12,9 @@ import { Eye, EyeOff } from "lucide-react";
 export default function AuthPage() {
   const [, setLocation] = useLocation();
   const { user, loginMutation, registerMutation } = useAuth();
-  const [showOnboarding, setShowOnboarding] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    return !localStorage.getItem('focuslock_onboarding_completed');
+  });
   const [isLogin, setIsLogin] = useState(true);
   const [showStrictMode, setShowStrictMode] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
