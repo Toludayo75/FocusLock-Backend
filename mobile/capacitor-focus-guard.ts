@@ -36,6 +36,7 @@ export interface FocusGuardPlugin {
   checkPermissions(): Promise<PermissionStatus>;
   requestPermissions(): Promise<{ success: boolean; granted: string[] }>;
   openPermissionSettings(options: { permission: 'accessibility' | 'overlay' | 'usageAccess' | 'batteryOptimization' }): Promise<void>;
+  requestBatteryOptimizationExemption(): Promise<{ success: boolean }>;
   
   // Session Management
   startSession(options: FocusSession): Promise<{ success: boolean; sessionId: string }>;
@@ -266,12 +267,25 @@ export const useFocusGuard = () => {
     }
   };
 
+  const requestBatteryOptimizationExemption = async (): Promise<boolean> => {
+    if (!isNativePlatform) return false;
+
+    try {
+      const result = await FocusGuard.requestBatteryOptimizationExemption();
+      return result.success;
+    } catch (error) {
+      console.log('Failed to request battery optimization exemption:', error);
+      return false;
+    }
+  };
+
   return {
     isNativePlatform,
     // Permission management
     checkPermissions,
     requestAllPermissions,
     openPermissionSettings,
+    requestBatteryOptimizationExemption,
     // Session management
     startEnforcementSession,
     stopEnforcementSession,

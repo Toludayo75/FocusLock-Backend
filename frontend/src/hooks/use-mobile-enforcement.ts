@@ -43,15 +43,25 @@ export const useMobileEnforcement = () => {
   const requestDeviceAdminPermission = async (): Promise<boolean> => {
     // MOBILE VERSION:
     if (focusGuard.isNativePlatform) {
+      // Request all required permissions including battery optimization exemption
+      console.log('🔒 Requesting FocusGuard permissions...');
       const granted = await focusGuard.requestAllPermissions();
+      
       if (granted) {
+        // Also request battery optimization exemption to ensure background services work
+        console.log('🔋 Requesting battery optimization exemption...');
+        await focusGuard.requestBatteryOptimizationExemption();
+        
         setEnforcementState(prev => ({ ...prev, isDeviceAdminEnabled: true }));
+        console.log('✅ All FocusGuard permissions granted');
+      } else {
+        console.log('❌ Some FocusGuard permissions were denied');
       }
       return granted;
     }
     
     // WEB VERSION: Show info toast
-    console.log('FocusGuard only available on mobile app');
+    console.log('🌐 FocusGuard only available on mobile app');
     return false;
   };
 
@@ -103,11 +113,21 @@ export const useMobileEnforcement = () => {
         currentApp: null
       });
       
-      // Start background monitoring (replaces manual app monitoring)
-      await focusGuard.startBackgroundMonitoring();
+      // 🚀 Start background monitoring service (critical for mobile)
+      const backgroundStarted = await focusGuard.startBackgroundMonitoring();
+      if (!backgroundStarted) {
+        console.warn('⚠️ Background monitoring failed to start - enforcement may not persist when app is backgrounded');
+      } else {
+        console.log('🔄 Background monitoring service started successfully');
+      }
+      
+      // 🔋 Request battery optimization exemption to ensure service survives
+      console.log('🔋 Ensuring battery optimization exemption...');
+      await focusGuard.requestBatteryOptimizationExemption();
       
       console.log(`✅ FocusGuard session started: ${blockedApps.length} apps will be blocked, ${taskData.targetApps.length} apps allowed`);
-      console.log(`Session ID: ${sessionId}`);
+      console.log(`📱 Session ID: ${sessionId}`);
+      console.log(`🔄 Background monitoring: ${backgroundStarted ? 'ACTIVE' : 'FAILED'}`);
       return true;
     }
 
