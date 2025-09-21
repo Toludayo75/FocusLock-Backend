@@ -14,6 +14,7 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(insertUser: InsertUser): Promise<User>;
+  updateUserFcmToken(userId: string, fcmToken: string | null): Promise<User | undefined>;
   
   // Task methods
   getTasksByUser(userId: string, range?: string): Promise<Task[]>;
@@ -61,6 +62,15 @@ export class DatabaseStorage implements IStorage {
       .values(insertUser)
       .returning();
     return user;
+  }
+
+  async updateUserFcmToken(userId: string, fcmToken: string | null): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({ fcmToken })
+      .where(eq(users.id, userId))
+      .returning();
+    return user || undefined;
   }
 
   async getTasksByUser(userId: string, range?: string): Promise<Task[]> {

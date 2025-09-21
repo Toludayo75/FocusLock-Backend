@@ -15,6 +15,7 @@ export const users = pgTable("users", {
   name: text("name").notNull(),
   strictModeEnabled: boolean("strict_mode_enabled").notNull().default(true),
   uninstallProtectionEnabled: boolean("uninstall_protection_enabled").notNull().default(false),
+  fcmToken: text("fcm_token"), // Firebase Cloud Messaging token for push notifications
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
   updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
 });

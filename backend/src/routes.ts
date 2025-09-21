@@ -348,6 +348,80 @@ export function registerRoutes(app: Express): void {
     }
   });
 
+  // FCM token management routes
+  app.post("/api/fcm/register", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      const { fcmToken } = req.body;
+      
+      if (!fcmToken || typeof fcmToken !== 'string') {
+        return res.status(400).json({ message: "Valid FCM token is required" });
+      }
+
+      const updatedUser = await storage.updateUserFcmToken(req.user!.id, fcmToken);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json({ message: "FCM token registered successfully" });
+    } catch (error) {
+      console.error("Error registering FCM token:", error);
+      res.status(500).json({ message: "Failed to register FCM token" });
+    }
+  });
+
+  app.delete("/api/fcm/unregister", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      const updatedUser = await storage.updateUserFcmToken(req.user!.id, null);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json({ message: "FCM token removed successfully" });
+    } catch (error) {
+      console.error("Error removing FCM token:", error);
+      res.status(500).json({ message: "Failed to remove FCM token" });
+    }
+  });
+
+  // Focus violation reporting endpoint
+  app.post("/api/violations/report", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      const { taskId, violationType, blockedApp } = req.body;
+      
+      // Import and use Firebase service here to send violation notification
+      const { firebaseService } = await import('./firebase-service.js');
+      
+      if (firebaseService.isReady() && req.user!.fcmToken) {
+        await firebaseService.sendFocusViolationNotification({
+          taskId,
+          taskTitle: 'Active Task', // You might want to fetch the actual task title
+          userId: req.user!.id,
+          violationType,
+          blockedApp
+        }, req.user!.fcmToken);
+      }
+      
+      res.json({ message: "Violation reported successfully" });
+    } catch (error) {
+      console.error("Error reporting violation:", error);
+      res.status(500).json({ message: "Failed to report violation" });
+    }
+  });
+
   // Stats and progress routes
   app.get("/api/stats", async (req, res) => {
     if (!req.isAuthenticated()) {

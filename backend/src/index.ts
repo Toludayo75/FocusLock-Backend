@@ -4,6 +4,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { registerRoutes } from "./routes.js";
 import { storage } from "./storage.js";
+import { firebaseService } from "./firebase-service.js";
 
 const app = express();
 const server = createServer(app);
@@ -97,6 +98,9 @@ class TaskScheduler {
           if (updatedTask) {
             console.log(`Auto-started task: ${task.title} (ID: ${task.id}) for user: ${task.userId}`);
             
+            // Get user information for push notification
+            const user = await storage.getUser(task.userId);
+            
             // Emit WebSocket event to specific user only (security fix)
             io.to(`user:${task.userId}`).emit('taskAutoStarted', {
               taskId: task.id,
@@ -109,6 +113,33 @@ class TaskScheduler {
             });
             
             console.log(`Emitted taskAutoStarted event to user room: user:${task.userId}`);
+            
+            // Send push notification as backup/fallback
+            if (firebaseService.isReady() && user?.fcmToken) {
+              try {
+                const notificationSent = await firebaseService.sendTaskAutoStartNotification({
+                  taskId: task.id,
+                  taskTitle: task.title,
+                  userId: task.userId,
+                  strictLevel: task.strictLevel,
+                  durationMinutes: task.durationMinutes
+                }, user.fcmToken);
+                
+                if (notificationSent) {
+                  console.log(`✅ Push notification sent to user ${task.userId} for task: ${task.title}`);
+                } else {
+                  console.log(`❌ Failed to send push notification to user ${task.userId}`);
+                }
+              } catch (pushError) {
+                console.error(`Error sending push notification to user ${task.userId}:`, pushError);
+              }
+            } else {
+              if (!firebaseService.isReady()) {
+                console.log(`⚠️ Firebase not ready - skipping push notification for user ${task.userId}`);
+              } else if (!user?.fcmToken) {
+                console.log(`⚠️ No FCM token for user ${task.userId} - skipping push notification`);
+              }
+            }
           }
         }
       }
