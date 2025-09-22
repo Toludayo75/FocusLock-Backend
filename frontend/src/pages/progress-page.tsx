@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/layout/header";
 import { BottomNavigation } from "@/components/layout/bottom-navigation";
-import { Task } from "@/types/task";
+import { Task } from "@/types/schema";
 import { Trophy, Target, Calendar, TrendingUp, CheckCircle, XCircle } from "lucide-react";
 
 interface ProgressStats {
@@ -36,46 +36,25 @@ export default function ProgressPage() {
     queryKey: ["/api/progress/stats"],
   });
 
-  // Calculate stats from tasks if API stats not available
-  const totalTasks = tasks.length;
-  const completedTasks = tasks.filter(task => task.status === 'COMPLETED').length;
-  const failedTasks = tasks.filter(task => task.status === 'FAILED').length;
-  const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+  // Use API stats data with fallback to calculated values from tasks
+  const totalTasks = stats?.totalTasks ?? tasks.length;
+  const completedTasks = stats?.completedTasks ?? tasks.filter(task => task.status === 'COMPLETED').length;
+  const failedTasks = stats?.failedTasks ?? tasks.filter(task => task.status === 'FAILED').length;
+  const completionRate = stats?.completionRate ?? (totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0);
 
-  // Mock weekly data for demo
-  const weeklyData = [
-    { day: "Mon", completed: 4, total: 5 },
-    { day: "Tue", completed: 3, total: 5 },
-    { day: "Wed", completed: 5, total: 5 },
-    { day: "Thu", completed: 4, total: 6 },
-    { day: "Fri", completed: 6, total: 6 },
-    { day: "Sat", completed: 2, total: 5 },
-    { day: "Sun", completed: 1, total: 3 },
+  // Use real weekly data from API with fallback to mock data
+  const weeklyData = stats?.weeklyData ?? [
+    { day: "Mon", completed: 0, total: 0 },
+    { day: "Tue", completed: 0, total: 0 },
+    { day: "Wed", completed: 0, total: 0 },
+    { day: "Thu", completed: 0, total: 0 },
+    { day: "Fri", completed: 0, total: 0 },
+    { day: "Sat", completed: 0, total: 0 },
+    { day: "Sun", completed: 0, total: 0 },
   ];
 
-  const achievements = [
-    {
-      id: "1",
-      title: "7-Day Streak",
-      description: "Completed tasks for 7 consecutive days",
-      dateEarned: "2 days ago",
-      icon: "fire"
-    },
-    {
-      id: "2", 
-      title: "First Task",
-      description: "Completed your first enforced task",
-      dateEarned: "1 week ago",
-      icon: "target"
-    },
-    {
-      id: "3",
-      title: "Perfect Week",
-      description: "100% completion rate for a full week",
-      dateEarned: "2 weeks ago", 
-      icon: "trophy"
-    }
-  ];
+  // Use real achievements from API with fallback to empty array
+  const achievements = stats?.achievements ?? [];
 
   const getAchievementIcon = (iconType: string) => {
     switch (iconType) {
