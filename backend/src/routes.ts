@@ -329,15 +329,13 @@ export function registerRoutes(app: Express): void {
       }
       
       // In a real implementation, this would process the uploaded file
-      const proof = await storage.createProof({
+      const result = await storage.createProofAndUpdateSession({
         sessionId,
         method: 'screenshot',
         result: { valid: true },
         score: 100,
-      });
-      
-      // Update session status to completed
-      await storage.updateEnforcementSession(sessionId, { status: 'UNLOCKED' });
+      }, sessionId, { status: 'UNLOCKED' });
+      const proof = result.proof;
       
       res.json({ valid: true, proof });
     } catch (error) {
@@ -369,15 +367,25 @@ export function registerRoutes(app: Express): void {
       const score = Object.keys(answers).length > 0 ? 85 : 0;
       const valid = score >= 70;
       
-      const proof = await storage.createProof({
-        sessionId,
-        method: 'quiz',
-        result: { answers, valid },
-        score,
-      });
+      let proof;
+      let updatedSession;
       
       if (valid) {
-        await storage.updateEnforcementSession(sessionId, { status: 'UNLOCKED' });
+        const result = await storage.createProofAndUpdateSession({
+          sessionId,
+          method: 'quiz',
+          result: { answers, valid },
+          score,
+        }, sessionId, { status: 'UNLOCKED' });
+        proof = result.proof;
+        updatedSession = result.session;
+      } else {
+        proof = await storage.createProof({
+          sessionId,
+          method: 'quiz',
+          result: { answers, valid },
+          score,
+        });
       }
       
       res.json({ valid, score, proof });
@@ -410,15 +418,25 @@ export function registerRoutes(app: Express): void {
       const valid = text && text.length > 20;
       const score = valid ? 90 : 0;
       
-      const proof = await storage.createProof({
-        sessionId,
-        method: 'checkin',
-        result: { text, valid },
-        score,
-      });
+      let proof;
+      let updatedSession;
       
       if (valid) {
-        await storage.updateEnforcementSession(sessionId, { status: 'UNLOCKED' });
+        const result = await storage.createProofAndUpdateSession({
+          sessionId,
+          method: 'checkin',
+          result: { text, valid },
+          score,
+        }, sessionId, { status: 'UNLOCKED' });
+        proof = result.proof;
+        updatedSession = result.session;
+      } else {
+        proof = await storage.createProof({
+          sessionId,
+          method: 'checkin',
+          result: { text, valid },
+          score,
+        });
       }
       
       res.json({ valid, proof });

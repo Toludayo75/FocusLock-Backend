@@ -33,6 +33,7 @@ export interface IStorage {
   
   // Proof methods
   createProof(insertProof: InsertProof): Promise<Proof>;
+  createProofAndUpdateSession(insertProof: InsertProof, sessionId: string, sessionUpdates: Partial<EnforcementSession>): Promise<{ proof: Proof; session: EnforcementSession }>;
   
   // Stats methods
   getUserStats(userId: string): Promise<any>;
@@ -196,6 +197,29 @@ export class DatabaseStorage implements IStorage {
       .values(insertProof)
       .returning();
     return proof;
+  }
+
+  async createProofAndUpdateSession(insertProof: InsertProof, sessionId: string, sessionUpdates: Partial<EnforcementSession>): Promise<{ proof: Proof; session: EnforcementSession }> {
+    return await db.transaction(async (tx) => {
+      // Create the proof
+      const [proof] = await tx
+        .insert(proofs)
+        .values(insertProof)
+        .returning();
+      
+      // Update the enforcement session
+      const [session] = await tx
+        .update(enforcementSessions)
+        .set(sessionUpdates)
+        .where(eq(enforcementSessions.id, sessionId))
+        .returning();
+      
+      if (!session) {
+        throw new Error("Session not found during update");
+      }
+      
+      return { proof, session };
+    });
   }
 
   async getUserStats(userId: string): Promise<any> {
