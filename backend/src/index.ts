@@ -11,12 +11,90 @@ import { storage } from "./storage.js";
 // Import Firebase service AFTER environment variables are loaded
 import { firebaseService } from "./firebase-service.js";
 
+// Secure origin checking function
+function isOriginAllowed(origin: string | undefined, allowedOrigins: string[]): boolean {
+  if (!origin) return false;
+  
+  // Handle null origin (file://, some mobile clients)
+  if (origin === 'null') return false;
+  
+  try {
+    const url = new URL(origin);
+    const hostname = url.hostname;
+    const port = url.port;
+    
+    return allowedOrigins.some(allowed => {
+      try {
+        // If pattern contains wildcard, handle subdomain matching
+        if (allowed.includes('*')) {
+          // Extract the domain pattern (e.g., "*.replit.dev" -> "replit.dev")
+          const domainPattern = allowed.replace('*.', '');
+          const allowedUrl = new URL(`https://${domainPattern}`);
+          const allowedHostname = allowedUrl.hostname;
+          
+          // Check if hostname exactly matches or is a subdomain
+          return hostname === allowedHostname || hostname.endsWith('.' + allowedHostname);
+        } else {
+          // Exact match comparison
+          const allowedUrl = new URL(allowed);
+          return hostname === allowedUrl.hostname && 
+                 (port === allowedUrl.port || (!port && !allowedUrl.port));
+        }
+      } catch {
+        // If URL parsing fails, fall back to string comparison
+        return origin === allowed;
+      }
+    });
+  } catch {
+    // If origin URL parsing fails, it's invalid
+    return false;
+  }
+}
+
 const app = express();
 const server = createServer(app);
+
+// Get CORS configuration
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+  : [];
+
+const isDevelopment = process.env.NODE_ENV !== 'production';
+if (isDevelopment) {
+  allowedOrigins.push('http://localhost:5000', 'http://localhost:3000');
+  // Add Replit development domains
+  allowedOrigins.push('https://*.replit.dev', 'https://*.repl.co');
+}
+
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
+    origin: function(origin, callback) {
+      // Allow no origin only in development (mobile apps, curl)
+      if (!origin && isDevelopment) {
+        return callback(null, true);
+      }
+      
+      // Allow mobile client null origins in development
+      if (origin === 'null' && isDevelopment) {
+        return callback(null, true);
+      }
+      
+      if (origin && isOriginAllowed(origin, allowedOrigins)) {
+        return callback(null, true);
+      }
+      
+      // In production, reject unknown origins
+      if (!isDevelopment) {
+        console.warn(`WebSocket CORS: Rejected origin: ${origin}`);
+        return callback('Not allowed by CORS', false);
+      }
+      
+      // In development, be more permissive but log warnings
+      console.warn(`WebSocket CORS: Allowing unregistered origin in development: ${origin}`);
+      return callback(null, true);
+    },
+    methods: ["GET", "POST"],
+    credentials: true
   },
   // Mobile-optimized settings for reliability
   pingTimeout: 60000, // 1 minute
@@ -25,18 +103,31 @@ const io = new Server(server, {
   allowEIO3: true
 });
 
-// Middleware - Enhanced CORS for Replit environment
+// Middleware - Secure CORS configuration
 app.use(cors({
   origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl requests)
-    if (!origin) return callback(null, true);
-    
-    // Allow any origin during development, especially Replit domains
-    if (origin.includes('replit.dev') || origin.includes('localhost')) {
+    // Allow no origin only in development (mobile apps, curl)
+    if (!origin && isDevelopment) {
       return callback(null, true);
     }
     
-    // Allow any origin for development
+    // Allow mobile client null origins in development
+    if (origin === 'null' && isDevelopment) {
+      return callback(null, true);
+    }
+    
+    if (origin && isOriginAllowed(origin, allowedOrigins)) {
+      return callback(null, true);
+    }
+    
+    // In production, reject unknown origins
+    if (!isDevelopment) {
+      console.warn(`HTTP CORS: Rejected origin: ${origin}`);
+      return callback(new Error('Not allowed by CORS'), false);
+    }
+    
+    // In development, be more permissive but log warnings
+    console.warn(`HTTP CORS: Allowing unregistered origin in development: ${origin}`);
     return callback(null, true);
   },
   credentials: true,
