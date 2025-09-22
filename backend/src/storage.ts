@@ -15,6 +15,14 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(insertUser: InsertUser): Promise<User>;
   updateUserFcmToken(userId: string, fcmToken: string | null): Promise<User | undefined>;
+  updateUserProfile(userId: string, updates: { name?: string; email?: string }): Promise<User | undefined>;
+  updateUserSettings(userId: string, updates: { 
+    strictModeEnabled?: boolean; 
+    uninstallProtectionEnabled?: boolean;
+    notificationTaskReminders?: boolean;
+    notificationStreakUpdates?: boolean;
+    notificationAccountabilityAlerts?: boolean;
+  }): Promise<User | undefined>;
   
   // Task methods
   getTasksByUser(userId: string, range?: string): Promise<Task[]>;
@@ -72,6 +80,41 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db
       .update(users)
       .set({ fcmToken })
+      .where(eq(users.id, userId))
+      .returning();
+    return user || undefined;
+  }
+
+  async updateUserProfile(userId: string, updates: { name?: string; email?: string }): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({ 
+        ...(updates.name && { name: updates.name }),
+        ...(updates.email && { email: updates.email }),
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return user || undefined;
+  }
+
+  async updateUserSettings(userId: string, updates: { 
+    strictModeEnabled?: boolean; 
+    uninstallProtectionEnabled?: boolean;
+    notificationTaskReminders?: boolean;
+    notificationStreakUpdates?: boolean;
+    notificationAccountabilityAlerts?: boolean;
+  }): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({ 
+        ...(updates.strictModeEnabled !== undefined && { strictModeEnabled: updates.strictModeEnabled }),
+        ...(updates.uninstallProtectionEnabled !== undefined && { uninstallProtectionEnabled: updates.uninstallProtectionEnabled }),
+        ...(updates.notificationTaskReminders !== undefined && { notificationTaskReminders: updates.notificationTaskReminders }),
+        ...(updates.notificationStreakUpdates !== undefined && { notificationStreakUpdates: updates.notificationStreakUpdates }),
+        ...(updates.notificationAccountabilityAlerts !== undefined && { notificationAccountabilityAlerts: updates.notificationAccountabilityAlerts }),
+        updatedAt: new Date()
+      })
       .where(eq(users.id, userId))
       .returning();
     return user || undefined;

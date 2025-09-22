@@ -23,6 +23,29 @@ const insertUserSchema = z.object({
   name: z.string().min(1),
 });
 
+// Settings validation schemas
+const updateProfileSchema = z.object({
+  name: z.string().trim().min(1, "Name cannot be empty").optional(),
+  email: z.string().email("Invalid email format").optional(),
+}).refine(data => data.name !== undefined || data.email !== undefined, {
+  message: "At least one field (name or email) is required",
+});
+
+const updateEnforcementSchema = z.object({
+  strictModeEnabled: z.boolean().optional(),
+  uninstallProtectionEnabled: z.boolean().optional(),
+}).refine(data => data.strictModeEnabled !== undefined || data.uninstallProtectionEnabled !== undefined, {
+  message: "At least one enforcement setting is required",
+});
+
+const updateNotificationsSchema = z.object({
+  taskReminders: z.boolean().optional(),
+  streakUpdates: z.boolean().optional(),
+  accountabilityAlerts: z.boolean().optional(),
+}).refine(data => data.taskReminders !== undefined || data.streakUpdates !== undefined || data.accountabilityAlerts !== undefined, {
+  message: "At least one notification setting is required",
+});
+
 declare global {
   namespace Express {
     interface User extends AppUser {}
@@ -584,6 +607,125 @@ export function registerRoutes(app: Express): void {
     } catch (error) {
       console.error("Error fetching progress stats:", error);
       res.status(500).json({ message: "Failed to fetch progress stats" });
+    }
+  });
+
+  // Settings routes
+  app.patch("/api/settings/profile", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      // Validate request body with Zod
+      const validationResult = updateProfileSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid input", 
+          errors: validationResult.error.errors 
+        });
+      }
+
+      const { name, email } = validationResult.data;
+
+      // Sanitize inputs
+      const updates: any = {};
+      if (name) updates.name = InputSanitizer.sanitizeTaskTitle(name);
+      if (email) updates.email = email.toLowerCase();
+
+      const user = await storage.updateUserProfile(req.user!.id, updates);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Don't return password in response
+      const { password, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      
+      // Handle database unique constraint violations
+      if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
+        return res.status(400).json({ message: "Email already in use" });
+      }
+      
+      res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
+  app.patch("/api/settings/enforcement", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      // Validate request body with Zod
+      const validationResult = updateEnforcementSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid input", 
+          errors: validationResult.error.errors 
+        });
+      }
+
+      const { strictModeEnabled, uninstallProtectionEnabled } = validationResult.data;
+
+      // Build updates object with only defined values
+      const updates: any = {};
+      if (strictModeEnabled !== undefined) updates.strictModeEnabled = strictModeEnabled;
+      if (uninstallProtectionEnabled !== undefined) updates.uninstallProtectionEnabled = uninstallProtectionEnabled;
+
+      const user = await storage.updateUserSettings(req.user!.id, updates);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json({ 
+        strictModeEnabled: user.strictModeEnabled,
+        uninstallProtectionEnabled: user.uninstallProtectionEnabled 
+      });
+    } catch (error) {
+      console.error("Error updating enforcement settings:", error);
+      res.status(500).json({ message: "Failed to update enforcement settings" });
+    }
+  });
+
+  app.patch("/api/settings/notifications", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      // Validate request body with Zod
+      const validationResult = updateNotificationsSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid input", 
+          errors: validationResult.error.errors 
+        });
+      }
+
+      const { taskReminders, streakUpdates, accountabilityAlerts } = validationResult.data;
+
+      // Build updates object with only defined values
+      const updates: any = {};
+      if (taskReminders !== undefined) updates.notificationTaskReminders = taskReminders;
+      if (streakUpdates !== undefined) updates.notificationStreakUpdates = streakUpdates;
+      if (accountabilityAlerts !== undefined) updates.notificationAccountabilityAlerts = accountabilityAlerts;
+
+      const user = await storage.updateUserSettings(req.user!.id, updates);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json({ 
+        taskReminders: user.notificationTaskReminders,
+        streakUpdates: user.notificationStreakUpdates,
+        accountabilityAlerts: user.notificationAccountabilityAlerts
+      });
+    } catch (error) {
+      console.error("Error updating notification settings:", error);
+      res.status(500).json({ message: "Failed to update notification settings" });
     }
   });
 
