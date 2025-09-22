@@ -106,7 +106,13 @@ export const useWebSocket = () => {
         }
       }
     } catch (error) {
-      console.error('❌ Error checking for active tasks:', error);
+      if (import.meta.env.DEV) {
+        console.error('❌ Error checking for active tasks:', {
+          error: error instanceof Error ? error.message : error,
+          userId: user?.id,
+          timestamp: new Date().toISOString()
+        });
+      }
     }
   }, [user?.id, handleTaskAutoStart]);
 

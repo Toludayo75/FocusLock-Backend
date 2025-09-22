@@ -8,9 +8,60 @@ const api = axios.create({
 
 async function throwIfResNotOk(error: any) {
   if (error.response) {
-    const message = error.response.data?.message || error.response.statusText;
-    throw new Error(`${error.response.status}: ${message}`);
+    const status = error.response.status;
+    const statusText = error.response.statusText;
+    const message = error.response.data?.message || statusText;
+    const details = error.response.data?.errors ? ` Details: ${JSON.stringify(error.response.data.errors)}` : '';
+    
+    // Log detailed error information for debugging (development only)
+    if (import.meta.env.DEV) {
+      console.error(`🔴 API Error [${status}]:`, {
+        url: error.config?.url,
+        method: error.config?.method?.toUpperCase(),
+        message,
+        details: error.response.data?.errors,
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    throw new Error(`${status}: ${message}${details}`);
   }
+  
+  // Handle network errors (comprehensive Axios pattern detection)
+  if (error.isAxiosError && !error.response) {
+    // Axios network errors: no response received
+    if (import.meta.env.DEV) {
+      console.error('🔴 Network Error:', {
+        message: error.message,
+        code: error.code,
+        timestamp: new Date().toISOString()
+      });
+    }
+    throw new Error('Network connection failed. Please check your internet connection and try again.');
+  }
+  
+  // Specific network error codes
+  if (error.code === 'ERR_NETWORK' || error.code === 'ECONNABORTED' || 
+      error.code === 'NETWORK_ERROR' || error.message === 'Network Error') {
+    if (import.meta.env.DEV) {
+      console.error('🔴 Network/Timeout Error:', {
+        message: error.message,
+        code: error.code,
+        timestamp: new Date().toISOString()
+      });
+    }
+    throw new Error('Network connection failed. Please check your internet connection and try again.');
+  }
+  
+  // Log unknown errors (development only)
+  if (import.meta.env.DEV) {
+    console.error('🔴 Unknown Error:', {
+      message: error.message,
+      code: error.code,
+      timestamp: new Date().toISOString()
+    });
+  }
+  
   throw error;
 }
 

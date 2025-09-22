@@ -54,9 +54,20 @@ export default function TasksPage() {
     },
     onSuccess: async ({ task: startedTask, pdfWindow }: { task: Task, pdfWindow?: Window | null }) => {
       // 1. Open PDF if it exists
+      let pdfOpened = false;
       if (startedTask.pdfFileUrl && pdfWindow) {
-        pdfWindow.location.href = startedTask.pdfFileUrl;
-        console.log("📄 Opening PDF:", startedTask.pdfFileUrl);
+        try {
+          pdfWindow.location.href = startedTask.pdfFileUrl;
+          console.log("📄 Opening PDF:", startedTask.pdfFileUrl);
+          pdfOpened = true;
+        } catch (error) {
+          console.error("❌ Failed to open PDF:", error);
+          toast({
+            title: "PDF Error",
+            description: "Failed to open the PDF file. You can access it later from the task details.",
+            variant: "destructive",
+          });
+        }
       }
       
       // 2. Start enforcement with task parameters
@@ -75,8 +86,10 @@ export default function TasksPage() {
       toast({
         title: "Task started",
         description: enforcementStarted ? 
-          (startedTask.pdfFileUrl ? "PDF opened and enforcement active!" : "Task active with enforcement!") :
-          (startedTask.pdfFileUrl ? "PDF opened (enforcement failed)" : "Task started (enforcement failed)")
+          (pdfOpened ? "PDF opened and enforcement active!" : 
+           startedTask.pdfFileUrl ? "Task active with enforcement! (PDF ready to view)" : "Task active with enforcement!") :
+          (pdfOpened ? "PDF opened (enforcement failed)" : 
+           startedTask.pdfFileUrl ? "Task started (enforcement failed, PDF ready to view)" : "Task started (enforcement failed)")
       });
     },
     onError: (error: Error) => {

@@ -146,10 +146,33 @@ registerRoutes(app);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
+  // Enhanced error logging with context
+  console.error('🔴 Unhandled Error:', {
+    timestamp: new Date().toISOString(),
+    method: req.method,
+    url: req.url,
+    userAgent: req.get('User-Agent'),
+    userId: req.user?.id || 'anonymous',
+    error: {
+      message: err.message,
+      stack: err.stack,
+      name: err.name,
+      status: err.status || err.statusCode
+    }
+  });
+  
   const status = err.status || err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
-  res.status(status).json({ message });
+  
+  // For 5xx errors, never expose internal details to prevent information disclosure
+  const message = status >= 500 ? "Internal Server Error" : (err.message || "Internal Server Error");
+  
+  // Don't expose stack traces in production
+  const response: any = { message };
+  if (process.env.NODE_ENV === 'development' && status < 500) {
+    response.stack = err.stack;
+  }
+  
+  res.status(status).json(response);
 });
 
 // Background Task Scheduler
@@ -165,7 +188,14 @@ class TaskScheduler {
         await this.checkAndStartDueTasks();
         await this.checkAndStopExpiredTasks();
       } catch (error) {
-        console.error('Error in background task scheduler:', error);
+        console.error('🔴 Error in background task scheduler:', {
+          timestamp: new Date().toISOString(),
+          error: error instanceof Error ? {
+            message: error.message,
+            stack: error.stack,
+            name: error.name
+          } : error
+        });
       }
     }, 30000); // 30 seconds
     

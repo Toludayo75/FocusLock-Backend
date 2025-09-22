@@ -65,9 +65,14 @@ class FirebaseService {
     if (!this.isInitialized) {
       this.initializeFirebase(); // Initialize on first use
       if (!this.isInitialized) {
-        console.warn('Firebase not initialized, skipping push notification');
+        console.warn('🔶 Firebase not initialized, skipping push notification for task:', notification.taskId);
         return false;
       }
+    }
+    
+    if (!fcmToken) {
+      console.warn('🔶 FCM token missing, cannot send notification for task:', notification.taskId);
+      return false;
     }
 
     try {
