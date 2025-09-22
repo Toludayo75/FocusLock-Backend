@@ -190,7 +190,34 @@ export function registerRoutes(app: Express): void {
     try {
       const { id } = req.params;
       const updates = req.body;
-      const task = await storage.updateTask(id, updates);
+      
+      // Verify task ownership before updating
+      const existingTask = await storage.getTask(id);
+      if (!existingTask) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      if (existingTask.userId !== req.user!.id) {
+        return res.status(403).json({ message: "Access denied. You can only modify your own tasks." });
+      }
+      
+      // Whitelist allowed fields and strip protected fields
+      const allowedFields = ['title', 'startAt', 'durationMinutes', 'strictLevel', 'targetApps', 'proofMethods', 'status'];
+      const filteredUpdates: any = {};
+      for (const field of allowedFields) {
+        if (updates[field] !== undefined) {
+          filteredUpdates[field] = updates[field];
+        }
+      }
+      
+      // Recalculate endAt if startAt or durationMinutes changed
+      if (filteredUpdates.startAt || filteredUpdates.durationMinutes) {
+        const startAt = filteredUpdates.startAt || existingTask.startAt;
+        const durationMinutes = filteredUpdates.durationMinutes || existingTask.durationMinutes;
+        filteredUpdates.endAt = new Date(new Date(startAt).getTime() + durationMinutes * 60000).toISOString();
+      }
+      
+      const task = await storage.updateTask(id, filteredUpdates);
       
       if (!task) {
         return res.status(404).json({ message: "Task not found" });
@@ -231,6 +258,17 @@ export function registerRoutes(app: Express): void {
 
     try {
       const { taskId, deviceId } = req.body;
+      
+      // Verify task ownership before creating enforcement session
+      const task = await storage.getTask(taskId);
+      if (!task) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      if (task.userId !== req.user!.id) {
+        return res.status(403).json({ message: "Access denied. You can only create sessions for your own tasks." });
+      }
+      
       const session = await storage.createEnforcementSession({
         taskId,
         deviceId: deviceId || 'web-device',
@@ -252,6 +290,17 @@ export function registerRoutes(app: Express): void {
     try {
       const { id } = req.params;
       const { status } = req.body;
+      
+      // Verify session ownership before updating status
+      const existingSession = await storage.getEnforcementSession(id);
+      if (!existingSession) {
+        return res.status(404).json({ message: "Session not found" });
+      }
+      
+      if (existingSession.userId !== req.user!.id) {
+        return res.status(403).json({ message: "Access denied. You can only modify your own sessions." });
+      }
+      
       const session = await storage.updateEnforcementSession(id, { status });
       res.json(session);
     } catch (error) {
@@ -268,6 +317,17 @@ export function registerRoutes(app: Express): void {
 
     try {
       const { sessionId } = req.params;
+      
+      // Verify session ownership before submitting proof
+      const session = await storage.getEnforcementSession(sessionId);
+      if (!session) {
+        return res.status(404).json({ message: "Session not found" });
+      }
+      
+      if (session.userId !== req.user!.id) {
+        return res.status(403).json({ message: "Access denied. You can only submit proof for your own sessions." });
+      }
+      
       // In a real implementation, this would process the uploaded file
       const proof = await storage.createProof({
         sessionId,
@@ -294,6 +354,16 @@ export function registerRoutes(app: Express): void {
     try {
       const { sessionId } = req.params;
       const { answers } = req.body;
+      
+      // Verify session ownership before submitting proof
+      const session = await storage.getEnforcementSession(sessionId);
+      if (!session) {
+        return res.status(404).json({ message: "Session not found" });
+      }
+      
+      if (session.userId !== req.user!.id) {
+        return res.status(403).json({ message: "Access denied. You can only submit proof for your own sessions." });
+      }
       
       // Simple quiz validation - in real app this would be more sophisticated
       const score = Object.keys(answers).length > 0 ? 85 : 0;
@@ -325,6 +395,16 @@ export function registerRoutes(app: Express): void {
     try {
       const { sessionId } = req.params;
       const { text } = req.body;
+      
+      // Verify session ownership before submitting proof
+      const session = await storage.getEnforcementSession(sessionId);
+      if (!session) {
+        return res.status(404).json({ message: "Session not found" });
+      }
+      
+      if (session.userId !== req.user!.id) {
+        return res.status(403).json({ message: "Access denied. You can only submit proof for your own sessions." });
+      }
       
       // Simple text validation - in real app this would use NLP
       const valid = text && text.length > 20;
