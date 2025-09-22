@@ -11,7 +11,7 @@ interface TaskAutoStartNotification {
   taskId: string;
   taskTitle: string;
   userId: string;
-  strictLevel: number;
+  strictLevel: string;
   durationMinutes: number;
 }
 
@@ -27,7 +27,7 @@ class FirebaseService {
   private isInitialized = false;
 
   constructor() {
-    this.initializeFirebase();
+    // Don't initialize Firebase in constructor - wait until first use
   }
 
   private initializeFirebase() {
@@ -63,8 +63,11 @@ class FirebaseService {
 
   async sendTaskAutoStartNotification(notification: TaskAutoStartNotification, fcmToken: string): Promise<boolean> {
     if (!this.isInitialized) {
-      console.warn('Firebase not initialized, skipping push notification');
-      return false;
+      this.initializeFirebase(); // Initialize on first use
+      if (!this.isInitialized) {
+        console.warn('Firebase not initialized, skipping push notification');
+        return false;
+      }
     }
 
     try {
@@ -117,8 +120,11 @@ class FirebaseService {
 
   async sendFocusViolationNotification(notification: FocusViolationNotification, fcmToken: string): Promise<boolean> {
     if (!this.isInitialized) {
-      console.warn('Firebase not initialized, skipping push notification');
-      return false;
+      this.initializeFirebase(); // Initialize on first use
+      if (!this.isInitialized) {
+        console.warn('Firebase not initialized, skipping push notification');
+        return false;
+      }
     }
 
     try {
@@ -178,7 +184,10 @@ class FirebaseService {
 
   async sendBulkNotifications(tokens: string[], payload: PushNotificationPayload): Promise<admin.messaging.BatchResponse> {
     if (!this.isInitialized) {
-      throw new Error('Firebase not initialized');
+      this.initializeFirebase(); // Initialize on first use
+      if (!this.isInitialized) {
+        throw new Error('Firebase not initialized');
+      }
     }
 
     const message = {
@@ -205,7 +214,10 @@ class FirebaseService {
 
   async validateToken(fcmToken: string): Promise<boolean> {
     if (!this.isInitialized) {
-      return false;
+      this.initializeFirebase(); // Initialize on first use
+      if (!this.isInitialized) {
+        return false;
+      }
     }
 
     try {
@@ -226,6 +238,9 @@ class FirebaseService {
   }
 
   isReady(): boolean {
+    if (!this.isInitialized) {
+      this.initializeFirebase(); // Initialize on first use
+    }
     return this.isInitialized;
   }
 }

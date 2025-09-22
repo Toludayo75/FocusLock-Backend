@@ -7,6 +7,8 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { registerRoutes } from "./routes.js";
 import { storage } from "./storage.js";
+
+// Import Firebase service AFTER environment variables are loaded
 import { firebaseService } from "./firebase-service.js";
 
 const app = express();
