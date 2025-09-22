@@ -91,15 +91,24 @@ export default function TasksPage() {
   const filterTasks = (filter: string) => {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
     
     switch (filter) {
       case "today":
         return tasks.filter(task => {
           const taskDate = new Date(task.startAt);
-          return taskDate >= today && taskDate < new Date(today.getTime() + 24 * 60 * 60 * 1000);
+          return taskDate >= today && taskDate < tomorrow && task.status !== 'COMPLETED';
         });
       case "upcoming":
-        return tasks.filter(task => new Date(task.startAt) > new Date(today.getTime() + 24 * 60 * 60 * 1000));
+        return tasks.filter(task => {
+          const taskDate = new Date(task.startAt);
+          return taskDate >= tomorrow && task.status !== 'COMPLETED';
+        });
+      case "overdue":
+        return tasks.filter(task => {
+          const taskEndTime = new Date(task.endAt);
+          return taskEndTime < now && task.status !== 'COMPLETED';
+        });
       case "completed":
         return tasks.filter(task => task.status === 'COMPLETED');
       default:
@@ -149,9 +158,10 @@ export default function TasksPage() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="today" data-testid="tab-today">Today</TabsTrigger>
             <TabsTrigger value="upcoming" data-testid="tab-upcoming">Upcoming</TabsTrigger>
+            <TabsTrigger value="overdue" data-testid="tab-overdue">Overdue</TabsTrigger>
             <TabsTrigger value="completed" data-testid="tab-completed">Completed</TabsTrigger>
           </TabsList>
 
@@ -162,8 +172,9 @@ export default function TasksPage() {
                   <ClipboardCheck className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>No {activeTab} tasks</p>
                   <p className="text-sm">
-                    {activeTab === "today" ? "No tasks scheduled for today" :
-                     activeTab === "upcoming" ? "No upcoming tasks scheduled" :
+                    {activeTab === "today" ? "No incomplete tasks scheduled for today" :
+                     activeTab === "upcoming" ? "No upcoming incomplete tasks scheduled" :
+                     activeTab === "overdue" ? "No overdue incomplete tasks" :
                      "No completed tasks yet"}
                   </p>
                 </CardContent>

@@ -72,6 +72,7 @@ class TaskScheduler {
     this.intervalId = setInterval(async () => {
       try {
         await this.checkAndStartDueTasks();
+        await this.checkAndStopExpiredTasks();
       } catch (error) {
         console.error('Error in background task scheduler:', error);
       }
@@ -79,6 +80,7 @@ class TaskScheduler {
     
     // Run once immediately on startup
     this.checkAndStartDueTasks();
+    this.checkAndStopExpiredTasks();
   }
   
   stop() {
@@ -150,6 +152,44 @@ class TaskScheduler {
       }
     } catch (error) {
       console.error('Error checking for due tasks:', error);
+    }
+  }
+
+  private async checkAndStopExpiredTasks() {
+    try {
+      console.log('Checking for expired tasks...');
+      const expiredTasks = await storage.getActiveTasksDueToStop();
+      console.log(`Found ${expiredTasks.length} expired tasks to stop`);
+      
+      if (expiredTasks.length > 0) {
+        for (const task of expiredTasks) {
+          // Mark task as COMPLETED since it has run its full duration
+          const updatedTask = await storage.updateTask(task.id, { status: 'COMPLETED' });
+          
+          if (updatedTask) {
+            console.log(`Auto-completed task: ${task.title} (ID: ${task.id}) for user: ${task.userId}`);
+            
+            // Get user information for push notification
+            const user = await storage.getUser(task.userId);
+            
+            // Emit WebSocket event to specific user to notify task completion
+            io.to(`user:${task.userId}`).emit('taskCompleted', {
+              taskId: task.id,
+              title: task.title,
+              userId: task.userId,
+              status: 'COMPLETED',
+              completedAt: new Date().toISOString()
+            });
+            
+            console.log(`Emitted taskCompleted event to user room: user:${task.userId}`);
+            
+            // TODO: Add task completion push notification later if needed
+            console.log(`📱 Task completed - user ${task.userId} will be notified via WebSocket`);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error checking for expired tasks:', error);
     }
   }
 }

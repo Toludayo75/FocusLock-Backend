@@ -23,6 +23,7 @@ export interface IStorage {
   updateTask(id: string, updates: Partial<Task>): Promise<Task | undefined>;
   deleteTask(id: string, userId: string): Promise<boolean>;
   getPendingTasksDueToStart(): Promise<Task[]>;
+  getActiveTasksDueToStop(): Promise<Task[]>;
   
   // Enforcement session methods
   createEnforcementSession(insertSession: InsertEnforcementSession): Promise<EnforcementSession>;
@@ -146,6 +147,17 @@ export class DatabaseStorage implements IStorage {
       .where(and(
         eq(tasks.status, 'PENDING'),
         lte(tasks.startAt, now)
+      ));
+  }
+
+  async getActiveTasksDueToStop(): Promise<Task[]> {
+    const now = new Date().toISOString();
+    return await db
+      .select()
+      .from(tasks)
+      .where(and(
+        eq(tasks.status, 'ACTIVE'),
+        lte(tasks.endAt, now)
       ));
   }
 
