@@ -90,7 +90,7 @@ export default function ProgressPage() {
           
           <Card data-testid="stat-current-streak">
             <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-accent mb-2">{stats?.currentStreak || 7}</div>
+              <div className="text-3xl font-bold text-accent mb-2">{stats?.currentStreak || 0}</div>
               <div className="text-sm text-muted-foreground">Day Streak</div>
             </CardContent>
           </Card>
@@ -185,7 +185,7 @@ export default function ProgressPage() {
                 <span>Current Streak</span>
                 <div className="flex items-center space-x-2">
                   <Trophy className="w-5 h-5 text-accent" />
-                  <span className="font-semibold">{stats?.currentStreak || 7} days</span>
+                  <span className="font-semibold">{stats?.currentStreak || 0} days</span>
                 </div>
               </div>
               
@@ -193,7 +193,7 @@ export default function ProgressPage() {
                 <span>Longest Streak</span>
                 <div className="flex items-center space-x-2">
                   <Trophy className="w-5 h-5 text-primary" />
-                  <span className="font-semibold">{stats?.longestStreak || 14} days</span>
+                  <span className="font-semibold">{stats?.longestStreak || 0} days</span>
                 </div>
               </div>
               
