@@ -320,23 +320,61 @@ export class DatabaseStorage implements IStorage {
       currentStreak: stats.streak,
       longestStreak: stats.streak + 3, // Mock data - will be fixed in task 4
       weeklyData,
-      achievements: [
-        {
-          id: "1",
-          title: "7-Day Streak",
-          description: "Completed tasks for 7 consecutive days",
-          dateEarned: "2 days ago",
-          icon: "fire"
-        },
-        {
-          id: "2",
-          title: "First Task",
-          description: "Completed your first enforced task",
-          dateEarned: "1 week ago",
-          icon: "target"
-        }
-      ]
+      achievements: await this.calculateAchievements(userId, stats, weeklyData)
     };
+  }
+
+  private async calculateAchievements(userId: string, stats: any, weeklyData: any[]): Promise<any[]> {
+    const achievements: any[] = [];
+    
+    // First Task Achievement - earned when user completes their first task
+    if (stats.completedTasks >= 1) {
+      achievements.push({
+        id: "first-task",
+        title: "First Task",
+        description: "Completed your first enforced task",
+        dateEarned: "Recently",
+        icon: "target"
+      });
+    }
+    
+    // 7-Day Streak Achievement - earned when user has current streak of 7+ days
+    if (stats.streak >= 7) {
+      achievements.push({
+        id: "7-day-streak",
+        title: "7-Day Streak", 
+        description: "Completed tasks for 7 consecutive days",
+        dateEarned: "Recently",
+        icon: "fire"
+      });
+    }
+    
+    // Perfect Week Achievement - earned when user has 100% completion for the week
+    const weeklyCompleted = weeklyData.reduce((sum, day) => sum + day.completed, 0);
+    const weeklyTotal = weeklyData.reduce((sum, day) => sum + day.total, 0);
+    
+    if (weeklyTotal > 0 && weeklyCompleted === weeklyTotal) {
+      achievements.push({
+        id: "perfect-week",
+        title: "Perfect Week",
+        description: "100% completion rate for a full week",
+        dateEarned: "This week",
+        icon: "trophy"
+      });
+    }
+    
+    // High Achiever - earned when user completes 10+ tasks
+    if (stats.completedTasks >= 10) {
+      achievements.push({
+        id: "high-achiever",
+        title: "High Achiever",
+        description: "Completed 10 or more tasks",
+        dateEarned: "Recently",
+        icon: "trophy"
+      });
+    }
+    
+    return achievements;
   }
 }
 
