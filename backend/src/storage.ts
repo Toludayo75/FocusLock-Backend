@@ -1,7 +1,7 @@
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { db, pool } from "./db.js";
-import { users, tasks, enforcementSessions, proofs, type User, type InsertUser, type Task, type InsertTask, type EnforcementSession, type InsertEnforcementSession, type Proof, type InsertProof } from "./schema.js";
+import { users, tasks, enforcementSessions, proofs, calendarIntegrations, calendarEvents, accountabilityPartners, type User, type InsertUser, type Task, type InsertTask, type EnforcementSession, type InsertEnforcementSession, type Proof, type InsertProof, type CalendarIntegration, type InsertCalendarIntegration, type CalendarEvent, type InsertCalendarEvent, type AccountabilityPartner, type InsertAccountabilityPartner } from "./schema.js";
 import { eq, and, gte, lte, desc } from "drizzle-orm";
 import { startOfDay, endOfDay, startOfWeek, endOfWeek } from "date-fns";
 
@@ -46,6 +46,23 @@ export interface IStorage {
   // Stats methods
   getUserStats(userId: string): Promise<any>;
   getProgressStats(userId: string): Promise<any>;
+  
+  // Calendar integration methods
+  createCalendarIntegration(insertIntegration: InsertCalendarIntegration): Promise<CalendarIntegration>;
+  getCalendarIntegrations(userId: string): Promise<CalendarIntegration[]>;
+  updateCalendarIntegration(id: string, updates: Partial<CalendarIntegration>): Promise<CalendarIntegration | undefined>;
+  deleteCalendarIntegration(id: string, userId: string): Promise<boolean>;
+  
+  // Calendar events methods
+  createCalendarEvent(insertEvent: InsertCalendarEvent): Promise<CalendarEvent>;
+  getCalendarEvents(userId: string, startDate?: string, endDate?: string): Promise<CalendarEvent[]>;
+  syncCalendarEvents(integrationId: string, events: InsertCalendarEvent[]): Promise<CalendarEvent[]>;
+  
+  // Accountability partners methods
+  getAccountabilityPartners(userId: string): Promise<AccountabilityPartner[]>;
+  addAccountabilityPartner(userId: string, partnerEmail: string): Promise<AccountabilityPartner>;
+  updateAccountabilityPartnerStatus(id: string, status: 'accepted' | 'rejected'): Promise<AccountabilityPartner | undefined>;
+  removeAccountabilityPartner(id: string, userId: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -408,6 +425,148 @@ export class DatabaseStorage implements IStorage {
     }
     
     return longestStreak;
+  }
+
+  // Calendar integration methods
+  async createCalendarIntegration(insertIntegration: InsertCalendarIntegration): Promise<CalendarIntegration> {
+    const [integration] = await db
+      .insert(calendarIntegrations)
+      .values(insertIntegration)
+      .returning();
+    return integration;
+  }
+
+  async getCalendarIntegrations(userId: string): Promise<CalendarIntegration[]> {
+    return await db
+      .select()
+      .from(calendarIntegrations)
+      .where(eq(calendarIntegrations.userId, userId));
+  }
+
+  async updateCalendarIntegration(id: string, updates: Partial<CalendarIntegration>): Promise<CalendarIntegration | undefined> {
+    const [integration] = await db
+      .update(calendarIntegrations)
+      .set({
+        ...updates,
+        updatedAt: new Date()
+      })
+      .where(eq(calendarIntegrations.id, id))
+      .returning();
+    return integration || undefined;
+  }
+
+  async deleteCalendarIntegration(id: string, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(calendarIntegrations)
+      .where(and(
+        eq(calendarIntegrations.id, id),
+        eq(calendarIntegrations.userId, userId)
+      ));
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  // Calendar events methods
+  async createCalendarEvent(insertEvent: InsertCalendarEvent): Promise<CalendarEvent> {
+    const [event] = await db
+      .insert(calendarEvents)
+      .values(insertEvent)
+      .returning();
+    return event;
+  }
+
+  async getCalendarEvents(userId: string, startDate?: string, endDate?: string): Promise<CalendarEvent[]> {
+    let whereConditions = [eq(calendarIntegrations.userId, userId)];
+
+    if (startDate && endDate) {
+      whereConditions.push(
+        gte(calendarEvents.startTime, startDate),
+        lte(calendarEvents.endTime, endDate)
+      );
+    }
+
+    const results = await db
+      .select()
+      .from(calendarEvents)
+      .innerJoin(calendarIntegrations, eq(calendarEvents.integrationId, calendarIntegrations.id))
+      .where(and(...whereConditions));
+
+    return results.map(result => result.calendar_events);
+  }
+
+  async syncCalendarEvents(integrationId: string, events: InsertCalendarEvent[]): Promise<CalendarEvent[]> {
+    // Delete existing events for this integration
+    await db
+      .delete(calendarEvents)
+      .where(eq(calendarEvents.integrationId, integrationId));
+
+    // Insert new events
+    if (events.length === 0) return [];
+    
+    const insertedEvents = await db
+      .insert(calendarEvents)
+      .values(events)
+      .returning();
+    
+    return insertedEvents;
+  }
+
+  // Accountability partners methods
+  async getAccountabilityPartners(userId: string): Promise<AccountabilityPartner[]> {
+    return await db
+      .select()
+      .from(accountabilityPartners)
+      .where(eq(accountabilityPartners.userId, userId));
+  }
+
+  async addAccountabilityPartner(userId: string, partnerEmail: string): Promise<AccountabilityPartner> {
+    // Find the partner user by email
+    const partnerUser = await this.getUserByEmail(partnerEmail);
+    if (!partnerUser) {
+      throw new Error('User with this email not found');
+    }
+
+    // Check if partnership already exists
+    const [existingPartnership] = await db
+      .select()
+      .from(accountabilityPartners)
+      .where(and(
+        eq(accountabilityPartners.userId, userId),
+        eq(accountabilityPartners.partnerUserId, partnerUser.id)
+      ));
+
+    if (existingPartnership) {
+      throw new Error('Partnership already exists');
+    }
+
+    const [partnership] = await db
+      .insert(accountabilityPartners)
+      .values({
+        userId,
+        partnerUserId: partnerUser.id,
+        status: 'pending'
+      })
+      .returning();
+    
+    return partnership;
+  }
+
+  async updateAccountabilityPartnerStatus(id: string, status: 'accepted' | 'rejected'): Promise<AccountabilityPartner | undefined> {
+    const [partnership] = await db
+      .update(accountabilityPartners)
+      .set({ status })
+      .where(eq(accountabilityPartners.id, id))
+      .returning();
+    return partnership || undefined;
+  }
+
+  async removeAccountabilityPartner(id: string, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(accountabilityPartners)
+      .where(and(
+        eq(accountabilityPartners.id, id),
+        eq(accountabilityPartners.userId, userId)
+      ));
+    return (result.rowCount ?? 0) > 0;
   }
 }
 

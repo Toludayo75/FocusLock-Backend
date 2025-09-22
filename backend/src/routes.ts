@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { setupAuth } from "./auth.js";
 import { storage } from "./storage.js";
 import { z } from "zod";
-import { Task, InsertTask, User as AppUser } from "./schema.js";
+import { Task, InsertTask, User as AppUser, CalendarIntegration, CalendarEvent, AccountabilityPartner } from "./schema.js";
 import { InputSanitizer } from "./sanitization.js";
 import multer from "multer";
 import path from "path";
@@ -44,6 +44,24 @@ const updateNotificationsSchema = z.object({
   accountabilityAlerts: z.boolean().optional(),
 }).refine(data => data.taskReminders !== undefined || data.streakUpdates !== undefined || data.accountabilityAlerts !== undefined, {
   message: "At least one notification setting is required",
+});
+
+// Calendar integration validation schemas
+const createCalendarIntegrationSchema = z.object({
+  provider: z.enum(['outlook', 'google', 'apple']),
+  accessToken: z.string().min(1),
+  refreshToken: z.string().optional(),
+  tokenExpiry: z.string().optional(),
+  calendarId: z.string().optional(),
+});
+
+// Accountability partners validation schemas
+const addAccountabilityPartnerSchema = z.object({
+  partnerEmail: z.string().email("Invalid email format"),
+});
+
+const updatePartnerStatusSchema = z.object({
+  status: z.enum(['accepted', 'rejected']),
 });
 
 declare global {
@@ -726,6 +744,192 @@ export function registerRoutes(app: Express): void {
     } catch (error) {
       console.error("Error updating notification settings:", error);
       res.status(500).json({ message: "Failed to update notification settings" });
+    }
+  });
+
+  // Calendar integration routes
+  app.get("/api/calendar/integrations", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      const integrations = await storage.getCalendarIntegrations(req.user!.id);
+      // Redact sensitive fields (tokens) before sending to client
+      const safeIntegrations = integrations.map(integration => ({
+        id: integration.id,
+        provider: integration.provider,
+        calendarId: integration.calendarId,
+        isEnabled: integration.isEnabled,
+        lastSyncAt: integration.lastSyncAt,
+        createdAt: integration.createdAt,
+        updatedAt: integration.updatedAt,
+      }));
+      res.json(safeIntegrations);
+    } catch (error) {
+      console.error("Error fetching calendar integrations:", error);
+      res.status(500).json({ message: "Failed to fetch calendar integrations" });
+    }
+  });
+
+  app.post("/api/calendar/integrations", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      const validationResult = createCalendarIntegrationSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid input", 
+          errors: validationResult.error.errors 
+        });
+      }
+
+      const { provider, accessToken, refreshToken, tokenExpiry, calendarId } = validationResult.data;
+
+      const integration = await storage.createCalendarIntegration({
+        userId: req.user!.id,
+        provider,
+        accessToken,
+        refreshToken: refreshToken || null,
+        tokenExpiry: tokenExpiry ? new Date(tokenExpiry) : null,
+        calendarId: calendarId || null,
+      });
+
+      res.status(201).json(integration);
+    } catch (error) {
+      console.error("Error creating calendar integration:", error);
+      res.status(500).json({ message: "Failed to create calendar integration" });
+    }
+  });
+
+  app.delete("/api/calendar/integrations/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      const { id } = req.params;
+      const deleted = await storage.deleteCalendarIntegration(id, req.user!.id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Calendar integration not found" });
+      }
+
+      res.json({ message: "Calendar integration deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting calendar integration:", error);
+      res.status(500).json({ message: "Failed to delete calendar integration" });
+    }
+  });
+
+  app.get("/api/calendar/events", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      const { startDate, endDate } = req.query;
+      const events = await storage.getCalendarEvents(
+        req.user!.id, 
+        startDate as string, 
+        endDate as string
+      );
+      res.json(events);
+    } catch (error) {
+      console.error("Error fetching calendar events:", error);
+      res.status(500).json({ message: "Failed to fetch calendar events" });
+    }
+  });
+
+  // Accountability partners routes
+  app.get("/api/accountability-partners", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      const partners = await storage.getAccountabilityPartners(req.user!.id);
+      res.json(partners);
+    } catch (error) {
+      console.error("Error fetching accountability partners:", error);
+      res.status(500).json({ message: "Failed to fetch accountability partners" });
+    }
+  });
+
+  app.post("/api/accountability-partners", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      const validationResult = addAccountabilityPartnerSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid input", 
+          errors: validationResult.error.errors 
+        });
+      }
+
+      const { partnerEmail } = validationResult.data;
+      const partnership = await storage.addAccountabilityPartner(req.user!.id, partnerEmail);
+
+      res.status(201).json(partnership);
+    } catch (error) {
+      console.error("Error adding accountability partner:", error);
+      const message = error instanceof Error ? error.message : "Failed to add accountability partner";
+      res.status(400).json({ message });
+    }
+  });
+
+  app.patch("/api/accountability-partners/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      const validationResult = updatePartnerStatusSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid input", 
+          errors: validationResult.error.errors 
+        });
+      }
+
+      const { id } = req.params;
+      const { status } = validationResult.data;
+      
+      const partnership = await storage.updateAccountabilityPartnerStatus(id, status);
+      
+      if (!partnership) {
+        return res.status(404).json({ message: "Partnership not found" });
+      }
+
+      res.json(partnership);
+    } catch (error) {
+      console.error("Error updating accountability partner status:", error);
+      res.status(500).json({ message: "Failed to update accountability partner status" });
+    }
+  });
+
+  app.delete("/api/accountability-partners/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      const { id } = req.params;
+      const deleted = await storage.removeAccountabilityPartner(id, req.user!.id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Partnership not found" });
+      }
+
+      res.json({ message: "Accountability partner removed successfully" });
+    } catch (error) {
+      console.error("Error removing accountability partner:", error);
+      res.status(500).json({ message: "Failed to remove accountability partner" });
     }
   });
 
