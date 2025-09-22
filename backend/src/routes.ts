@@ -3,6 +3,7 @@ import { setupAuth } from "./auth.js";
 import { storage } from "./storage.js";
 import { z } from "zod";
 import { Task, InsertTask, User as AppUser } from "./schema.js";
+import { InputSanitizer } from "./sanitization.js";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -137,7 +138,7 @@ export function registerRoutes(app: Express): void {
 
     try {
       // Parse form data - handle both JSON and multipart/form-data
-      const formData = {
+      const rawFormData = {
         title: req.body.title,
         startAt: req.body.startAt,
         durationMinutes: parseInt(req.body.durationMinutes),
@@ -150,6 +151,19 @@ export function registerRoutes(app: Express): void {
           : JSON.parse(req.body.proofMethods || '["screenshot"]'),
       };
 
+      // Sanitize user input to prevent XSS
+      const formData = {
+        ...rawFormData,
+        title: InputSanitizer.sanitizeTaskTitle(rawFormData.title),
+        targetApps: InputSanitizer.sanitizeStringArray(rawFormData.targetApps),
+        proofMethods: InputSanitizer.sanitizeStringArray(rawFormData.proofMethods),
+      };
+
+      // Validate sanitized data
+      if (!formData.title.trim()) {
+        return res.status(400).json({ message: "Task title is required and cannot be empty" });
+      }
+
       const taskData = insertTaskSchema.parse(formData);
       
       // Validate that at least one of target apps or PDF file is provided
@@ -161,8 +175,9 @@ export function registerRoutes(app: Express): void {
       
       let pdfFileUrl = null;
       if (req.file) {
-        // Store relative path to uploaded PDF
-        pdfFileUrl = `/uploads/pdfs/${req.file.filename}`;
+        // Sanitize and store relative path to uploaded PDF
+        const sanitizedFilename = InputSanitizer.sanitizeFilePath(req.file.filename);
+        pdfFileUrl = `/uploads/pdfs/${sanitizedFilename}`;
       }
 
       const task = await storage.createTask({

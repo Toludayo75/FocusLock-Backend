@@ -86,7 +86,7 @@ const io = new Server(server, {
       // In production, reject unknown origins
       if (!isDevelopment) {
         console.warn(`WebSocket CORS: Rejected origin: ${origin}`);
-        return callback('Not allowed by CORS', false);
+        return callback(new Error('Not allowed by CORS'), false);
       }
       
       // In development, be more permissive but log warnings

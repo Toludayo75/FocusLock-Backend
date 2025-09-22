@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 import { storage } from "./storage.js";
 import { User as DatabaseUser } from "./schema.js";
 import { z } from "zod";
+import { InputSanitizer } from "./sanitization.js";
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -91,16 +92,25 @@ export function setupAuth(app: Express): void {
     try {
       const userData = registerSchema.parse(req.body);
       
-      const existingUser = await storage.getUserByEmail(userData.email);
+      // Sanitize user input to prevent XSS
+      const sanitizedEmail = InputSanitizer.sanitizeEmail(userData.email);
+      const sanitizedName = InputSanitizer.sanitizeUserName(userData.name);
+      
+      // Validate sanitized data isn't empty
+      if (!sanitizedEmail || !sanitizedName) {
+        return res.status(400).json({ message: "Invalid email or name provided" });
+      }
+      
+      const existingUser = await storage.getUserByEmail(sanitizedEmail);
       if (existingUser) {
         return res.status(400).json({ message: "Email already exists" });
       }
 
       const hashedPassword = await hashPassword(userData.password);
       const user = await storage.createUser({
-        email: userData.email,
+        email: sanitizedEmail,
         password: hashedPassword,
-        name: userData.name,
+        name: sanitizedName,
         strictModeEnabled: true,
         uninstallProtectionEnabled: false,
       });
@@ -129,7 +139,16 @@ export function setupAuth(app: Express): void {
 
   app.post("/api/login", (req, res, next) => {
     try {
-      loginSchema.parse(req.body);
+      const loginData = loginSchema.parse(req.body);
+      
+      // Sanitize email input
+      const sanitizedEmail = InputSanitizer.sanitizeEmail(loginData.email);
+      if (!sanitizedEmail) {
+        return res.status(400).json({ message: "Invalid email provided" });
+      }
+      
+      // Replace the email in req.body with sanitized version for passport
+      req.body.email = sanitizedEmail;
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid input", errors: error.errors });
