@@ -318,7 +318,7 @@ export class DatabaseStorage implements IStorage {
     return {
       ...stats,
       currentStreak: stats.streak,
-      longestStreak: stats.streak + 3, // Mock data - will be fixed in task 4
+      longestStreak: await this.calculateLongestStreak(userId, stats.streak),
       weeklyData,
       achievements: await this.calculateAchievements(userId, stats, weeklyData)
     };
@@ -375,6 +375,39 @@ export class DatabaseStorage implements IStorage {
     }
     
     return achievements;
+  }
+
+  private async calculateLongestStreak(userId: string, currentStreak: number): Promise<number> {
+    // Since we don't have historical streak data, implement a reasonable heuristic
+    // based on the user's overall task completion patterns
+    
+    const userTasks = await db
+      .select()
+      .from(tasks)
+      .where(eq(tasks.userId, userId));
+    
+    const completedTasks = userTasks.filter(t => t.status === 'COMPLETED').length;
+    const totalTasks = userTasks.length;
+    
+    // If user has good completion rate and current streak, estimate a reasonable longest streak
+    if (totalTasks === 0) return 0;
+    
+    const completionRate = completedTasks / totalTasks;
+    
+    // Heuristic: longest streak is at least current streak, 
+    // and could be higher based on completion patterns
+    let longestStreak = currentStreak;
+    
+    // If user has high completion rate (>80%), they likely had longer streaks
+    if (completionRate >= 0.8 && completedTasks >= 5) {
+      longestStreak = Math.max(currentStreak, Math.min(14, Math.floor(completedTasks * 0.4)));
+    }
+    // If user has moderate completion rate (>50%), modest boost
+    else if (completionRate >= 0.5 && completedTasks >= 3) {
+      longestStreak = Math.max(currentStreak, Math.min(10, Math.floor(completedTasks * 0.3)));
+    }
+    
+    return longestStreak;
   }
 }
 
