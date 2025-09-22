@@ -102,6 +102,43 @@ export const accountabilityPartners = pgTable("accountability_partners", {
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
 
+// Calendar integrations table
+export const calendarIntegrations = pgTable("calendar_integrations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  provider: text("provider").notNull(), // 'outlook', 'google', 'apple'
+  accessToken: text("access_token").notNull(),
+  refreshToken: text("refresh_token"),
+  tokenExpiry: timestamp("token_expiry"),
+  calendarId: text("calendar_id"),
+  isEnabled: boolean("is_enabled").notNull().default(true),
+  lastSyncAt: timestamp("last_sync_at"),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+  updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
+});
+
+// Calendar events table (synced from external calendars)
+export const calendarEvents = pgTable("calendar_events", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  integrationId: varchar("integration_id").notNull().references(() => calendarIntegrations.id, { onDelete: 'cascade' }),
+  externalEventId: text("external_event_id").notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  startTime: text("start_time").notNull(), // ISO string
+  endTime: text("end_time").notNull(), // ISO string
+  isAllDay: boolean("is_all_day").notNull().default(false),
+  location: text("location"),
+  attendees: jsonb("attendees").default([]),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+  updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
+}, (table) => {
+  return {
+    integrationIdIdx: index("calendar_events_integration_id_idx").on(table.integrationId),
+    externalEventIdIdx: index("calendar_events_external_id_idx").on(table.externalEventId),
+    startTimeIdx: index("calendar_events_start_time_idx").on(table.startTime),
+  };
+});
+
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
@@ -109,6 +146,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   enforcementSessions: many(enforcementSessions),
   accountabilityPartners: many(accountabilityPartners, { relationName: 'user' }),
   partnerRelations: many(accountabilityPartners, { relationName: 'partner' }),
+  calendarIntegrations: many(calendarIntegrations),
 }));
 
 export const tasksRelations = relations(tasks, ({ one, many }) => ({
@@ -159,6 +197,21 @@ export const accountabilityPartnersRelations = relations(accountabilityPartners,
   }),
 }));
 
+export const calendarIntegrationsRelations = relations(calendarIntegrations, ({ one, many }) => ({
+  user: one(users, {
+    fields: [calendarIntegrations.userId],
+    references: [users.id],
+  }),
+  events: many(calendarEvents),
+}));
+
+export const calendarEventsRelations = relations(calendarEvents, ({ one }) => ({
+  integration: one(calendarIntegrations, {
+    fields: [calendarEvents.integrationId],
+    references: [calendarIntegrations.id],
+  }),
+}));
+
 // Type exports
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
@@ -177,3 +230,9 @@ export type InsertUsageLog = typeof usageLogs.$inferInsert;
 
 export type AccountabilityPartner = typeof accountabilityPartners.$inferSelect;
 export type InsertAccountabilityPartner = typeof accountabilityPartners.$inferInsert;
+
+export type CalendarIntegration = typeof calendarIntegrations.$inferSelect;
+export type InsertCalendarIntegration = typeof calendarIntegrations.$inferInsert;
+
+export type CalendarEvent = typeof calendarEvents.$inferSelect;
+export type InsertCalendarEvent = typeof calendarEvents.$inferInsert;
