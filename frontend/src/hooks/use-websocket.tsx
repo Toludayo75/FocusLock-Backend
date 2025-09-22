@@ -147,7 +147,23 @@ export const useWebSocket = () => {
 
   // WebSocket setup effect
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      // Clean up existing connection if user logs out
+      if (socketRef.current) {
+        console.log('🔌 Disconnecting WebSocket (user logged out)');
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+      setWsConnected(false);
+      return;
+    }
+
+    // Prevent duplicate connections
+    if (socketRef.current && socketRef.current.connected) {
+      return;
+    }
+
+    console.log('🔌 Setting up WebSocket connection for user:', user.id);
 
     // Connect to WebSocket server using the Vite proxy setup
     const wsUrl = import.meta.env.VITE_WS_URL || window.location.origin;
@@ -174,6 +190,7 @@ export const useWebSocket = () => {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
         pollingIntervalRef.current = null;
+        console.log('⏹️ Stopped HTTP polling (WebSocket connected)');
       }
       
       // Join user-specific room for secure messaging
@@ -187,8 +204,9 @@ export const useWebSocket = () => {
       console.log('❌ Disconnected from WebSocket server:', reason);
       setWsConnected(false);
       
-      // Start HTTP polling fallback when WebSocket disconnects
-      if (user?.id && !pollingIntervalRef.current) {
+      // Start HTTP polling fallback when WebSocket disconnects (but not if it's due to intentional logout)
+      if (user?.id && !pollingIntervalRef.current && reason !== 'io client disconnect') {
+        console.log('🔄 Starting HTTP polling fallback due to disconnect:', reason);
         startHttpPolling();
       }
     });
@@ -216,20 +234,64 @@ export const useWebSocket = () => {
       pdfFileUrl: string | null;
     }) => {
       console.log('🚀 Task auto-started via WebSocket:', data);
-      await handleTaskAutoStart(data);
+      
+      // Prevent duplicate triggers
+      if (lastSeenTasksRef.current.has(data.taskId)) {
+        return;
+      }
+      lastSeenTasksRef.current.add(data.taskId);
+
+      console.log(`🎯 Processing task auto-start via websocket:`, data.title);
+      
+      // Invalidate tasks query to refresh the UI
+      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+      
+      // 🚀 AUTOMATICALLY START MOBILE ENFORCEMENT
+      try {
+        const enforcementStarted = await mobileEnforcement.startEnforcement({
+          strictLevel: data.strictLevel,
+          targetApps: data.targetApps,
+          durationMinutes: data.durationMinutes
+        });
+        
+        if (enforcementStarted) {
+          console.log('✅ Mobile enforcement started automatically for task:', data.title);
+        } else {
+          console.log('⚠️ Mobile enforcement failed to start for task:', data.title);
+        }
+      } catch (error) {
+        console.error('❌ Error starting mobile enforcement:', error);
+      }
+      
+      // Show toast notification
+      toast({
+        title: "Task Started Automatically",
+        description: `"${data.title}" has started and enforcement is now active`,
+        duration: 5000,
+      });
+
+      // Optional: Open PDF if it exists
+      if (data.pdfFileUrl) {
+        const pdfWindow = window.open(data.pdfFileUrl, '_blank');
+        if (pdfWindow) {
+          console.log('📄 Auto-opened PDF:', data.pdfFileUrl);
+        }
+      }
     });
 
     return () => {
-      // Cleanup on unmount
+      // Cleanup on component unmount only
+      console.log('🧹 WebSocket useEffect cleanup');
       if (socketRef.current) {
         socketRef.current.disconnect();
+        socketRef.current = null;
       }
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
         pollingIntervalRef.current = null;
       }
     };
-  }, [user?.id, handleTaskAutoStart, startHttpPolling]);
+  }, [user?.id]); // Only depend on user?.id to prevent reconnection loops
 
   // Handle online/offline events
   useEffect(() => {
