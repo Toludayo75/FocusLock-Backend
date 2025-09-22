@@ -297,19 +297,29 @@ export class DatabaseStorage implements IStorage {
   async getProgressStats(userId: string): Promise<any> {
     const stats = await this.getUserStats(userId);
     
+    // Get real weekly data from tasks
+    const weeklyTasks = await this.getTasksByUser(userId, 'week');
+    
+    // Group tasks by day of week and calculate stats
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const weeklyData = dayNames.map(day => ({ day, completed: 0, total: 0 }));
+    
+    weeklyTasks.forEach(task => {
+      const taskDate = new Date(task.startAt);
+      const dayIndex = taskDate.getDay(); // 0 = Sunday, 1 = Monday, etc.
+      const dayData = weeklyData[dayIndex];
+      
+      dayData.total++;
+      if (task.status === 'COMPLETED') {
+        dayData.completed++;
+      }
+    });
+    
     return {
       ...stats,
       currentStreak: stats.streak,
-      longestStreak: stats.streak + 3, // Mock data
-      weeklyData: [
-        { day: "Mon", completed: 4, total: 5 },
-        { day: "Tue", completed: 3, total: 5 },
-        { day: "Wed", completed: 5, total: 5 },
-        { day: "Thu", completed: 4, total: 6 },
-        { day: "Fri", completed: 6, total: 6 },
-        { day: "Sat", completed: 2, total: 5 },
-        { day: "Sun", completed: 1, total: 3 },
-      ],
+      longestStreak: stats.streak + 3, // Mock data - will be fixed in task 4
+      weeklyData,
       achievements: [
         {
           id: "1",
