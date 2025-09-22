@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, integer, jsonb, boolean, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, integer, jsonb, boolean, pgEnum, index } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 // Enums
@@ -35,6 +35,15 @@ export const tasks = pgTable("tasks", {
   status: taskStatusEnum("status").notNull().default('PENDING'),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
   updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
+}, (table) => {
+  return {
+    userIdIdx: index("tasks_user_id_idx").on(table.userId),
+    statusIdx: index("tasks_status_idx").on(table.status),
+    startAtIdx: index("tasks_start_at_idx").on(table.startAt),
+    endAtIdx: index("tasks_end_at_idx").on(table.endAt),
+    userStatusIdx: index("tasks_user_status_idx").on(table.userId, table.status),
+    userStartAtIdx: index("tasks_user_start_at_idx").on(table.userId, table.startAt),
+  };
 });
 
 // Enforcement Sessions table
@@ -49,6 +58,12 @@ export const enforcementSessions = pgTable("enforcement_sessions", {
   unlockedAt: timestamp("unlocked_at"),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
   updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
+}, (table) => {
+  return {
+    userIdIdx: index("enforcement_sessions_user_id_idx").on(table.userId),
+    taskIdIdx: index("enforcement_sessions_task_id_idx").on(table.taskId),
+    statusIdx: index("enforcement_sessions_status_idx").on(table.status),
+  };
 });
 
 // Proofs table
@@ -60,6 +75,10 @@ export const proofs = pgTable("proofs", {
   score: integer("score").notNull().default(0),
   fileUrl: text("file_url"), // for screenshot proofs
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
+}, (table) => {
+  return {
+    sessionIdIdx: index("proofs_session_id_idx").on(table.sessionId),
+  };
 });
 
 // Usage logs table (for tracking app usage during sessions)
@@ -79,6 +98,7 @@ export const accountabilityPartners = pgTable("accountability_partners", {
   status: text("status").notNull().default('pending'), // 'pending', 'accepted', 'rejected'
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
+
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
