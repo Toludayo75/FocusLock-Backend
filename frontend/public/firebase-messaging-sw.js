@@ -2,21 +2,44 @@
 importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
 
-// Initialize Firebase in service worker
-firebase.initializeApp({
-  apiKey: "AIzaSyBL7YSiP1kx-E7O5_tmuZ2s4vtCecu5Gd4",
-  authDomain: "focuslock-9195a.firebaseapp.com",
-  projectId: "focuslock-9195a",
-  storageBucket: "focuslock-9195a.firebasestorage.app",
-  messagingSenderId: "1055023421536",
-  appId: "1:1055023421536:web:2c94781907851faf49cb05"
+let messaging = null;
+
+// Initialize Firebase dynamically by fetching config from backend
+async function initializeFirebase() {
+  try {
+    // Fetch Firebase config from backend endpoint
+    const response = await fetch('/api/firebase-config');
+    
+    if (!response.ok) {
+      console.error('Failed to fetch Firebase config:', response.status);
+      return false;
+    }
+    
+    const { firebaseConfig } = await response.json();
+    
+    // Initialize Firebase with config from environment variables
+    firebase.initializeApp(firebaseConfig);
+    messaging = firebase.messaging();
+    
+    console.log('Firebase initialized successfully in service worker');
+    return true;
+  } catch (error) {
+    console.error('Error initializing Firebase in service worker:', error);
+    return false;
+  }
+}
+
+// Initialize Firebase and set up background message handler
+initializeFirebase().then((initialized) => {
+  if (initialized && messaging) {
+    setupBackgroundMessageHandler();
+  }
 });
 
-const messaging = firebase.messaging();
-
 // Handle background messages
-messaging.onBackgroundMessage((payload) => {
-  console.log('Received background message:', payload);
+function setupBackgroundMessageHandler() {
+  messaging.onBackgroundMessage((payload) => {
+    console.log('Received background message:', payload);
   
   const notificationTitle = payload.notification?.title || 'FocusLock';
   const notificationOptions = {
@@ -42,8 +65,9 @@ messaging.onBackgroundMessage((payload) => {
     ];
   }
 
-  self.registration.showNotification(notificationTitle, notificationOptions);
-});
+    self.registration.showNotification(notificationTitle, notificationOptions);
+  });
+}
 
 // Handle notification clicks
 self.addEventListener('notificationclick', (event) => {

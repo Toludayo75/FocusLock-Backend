@@ -20,6 +20,7 @@ export interface IStorage {
   getTasksByUser(userId: string, range?: string): Promise<Task[]>;
   getActiveTasksByUser(userId: string): Promise<Task[]>;
   createTask(insertTask: InsertTask): Promise<Task>;
+  getTask(id: string): Promise<Task | undefined>;
   updateTask(id: string, updates: Partial<Task>): Promise<Task | undefined>;
   deleteTask(id: string, userId: string): Promise<boolean>;
   getPendingTasksDueToStart(): Promise<Task[]>;
@@ -27,6 +28,7 @@ export interface IStorage {
   
   // Enforcement session methods
   createEnforcementSession(insertSession: InsertEnforcementSession): Promise<EnforcementSession>;
+  getEnforcementSession(id: string): Promise<EnforcementSession | undefined>;
   updateEnforcementSession(id: string, updates: Partial<EnforcementSession>): Promise<EnforcementSession | undefined>;
   
   // Proof methods
@@ -123,6 +125,11 @@ export class DatabaseStorage implements IStorage {
     return task;
   }
 
+  async getTask(id: string): Promise<Task | undefined> {
+    const [task] = await db.select().from(tasks).where(eq(tasks.id, id));
+    return task || undefined;
+  }
+
   async updateTask(id: string, updates: Partial<Task>): Promise<Task | undefined> {
     const [task] = await db
       .update(tasks)
@@ -167,6 +174,11 @@ export class DatabaseStorage implements IStorage {
       .values(insertSession)
       .returning();
     return session;
+  }
+
+  async getEnforcementSession(id: string): Promise<EnforcementSession | undefined> {
+    const [session] = await db.select().from(enforcementSessions).where(eq(enforcementSessions.id, id));
+    return session || undefined;
   }
 
   async updateEnforcementSession(id: string, updates: Partial<EnforcementSession>): Promise<EnforcementSession | undefined> {
