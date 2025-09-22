@@ -12,6 +12,10 @@ export interface User {
   name: string;
   strictModeEnabled: boolean;
   uninstallProtectionEnabled: boolean;
+  notificationTaskReminders: boolean;
+  notificationStreakUpdates: boolean;
+  notificationAccountabilityAlerts: boolean;
+  fcmToken: string | null;
   createdAt: string;
   updatedAt: string;
 }

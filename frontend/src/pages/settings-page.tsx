@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
+import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,14 +34,15 @@ type SettingsView = 'main' | 'profile' | 'notifications' | 'focus' | 'integratio
 export default function SettingsPage() {
   const { user, logoutMutation } = useAuth();
   const pushNotifications = usePushNotifications();
+  const { toast } = useToast();
   const [currentView, setCurrentView] = useState<SettingsView>('main');
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [strictModeEnabled, setStrictModeEnabled] = useState(true);
-  const [uninstallProtectionEnabled, setUninstallProtectionEnabled] = useState(false);
+  const [strictModeEnabled, setStrictModeEnabled] = useState(user?.strictModeEnabled ?? true);
+  const [uninstallProtectionEnabled, setUninstallProtectionEnabled] = useState(user?.uninstallProtectionEnabled ?? false);
   const [notificationSettings, setNotificationSettings] = useState({
-    taskReminders: true,
-    streakUpdates: true,
-    accountabilityAlerts: false,
+    taskReminders: user?.notificationTaskReminders ?? true,
+    streakUpdates: user?.notificationStreakUpdates ?? true,
+    accountabilityAlerts: user?.notificationAccountabilityAlerts ?? false,
   });
   const [profileData, setProfileData] = useState({
     name: user?.name || "",
@@ -48,9 +52,141 @@ export default function SettingsPage() {
     confirmPassword: "",
   });
 
+  // Update state when user data changes
+  useEffect(() => {
+    if (user) {
+      setStrictModeEnabled(user.strictModeEnabled);
+      setUninstallProtectionEnabled(user.uninstallProtectionEnabled);
+      setNotificationSettings({
+        taskReminders: user.notificationTaskReminders,
+        streakUpdates: user.notificationStreakUpdates,
+        accountabilityAlerts: user.notificationAccountabilityAlerts,
+      });
+      setProfileData(prev => ({
+        ...prev,
+        name: user.name,
+        email: user.email,
+      }));
+    }
+  }, [user]);
+
+  // Profile update mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: async (updates: { name?: string; email?: string }) => {
+      const response = await apiRequest("PATCH", "/api/settings/profile", updates);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been successfully updated.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Update failed", 
+        description: error.message || "Failed to update profile. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Enforcement settings mutation
+  const updateEnforcementMutation = useMutation({
+    mutationFn: async (updates: { strictModeEnabled?: boolean; uninstallProtectionEnabled?: boolean }) => {
+      const response = await apiRequest("PATCH", "/api/settings/enforcement", updates);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      toast({
+        title: "Settings updated",
+        description: "Your enforcement settings have been updated.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Update failed",
+        description: error.message || "Failed to update settings. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Notification settings mutation
+  const updateNotificationsMutation = useMutation({
+    mutationFn: async (updates: { taskReminders?: boolean; streakUpdates?: boolean; accountabilityAlerts?: boolean }) => {
+      const response = await apiRequest("PATCH", "/api/settings/notifications", updates);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      toast({
+        title: "Notifications updated",
+        description: "Your notification preferences have been updated.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Update failed",
+        description: error.message || "Failed to update notifications. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleLogout = () => {
     logoutMutation.mutate();
     setShowLogoutModal(false);
+  };
+
+  // Handler functions
+  const handleProfileSave = () => {
+    const updates: any = {};
+    if (profileData.name !== user?.name) updates.name = profileData.name;
+    if (profileData.email !== user?.email) updates.email = profileData.email;
+    
+    if (Object.keys(updates).length > 0) {
+      updateProfileMutation.mutate(updates);
+    }
+  };
+
+  const handleStrictModeChange = (enabled: boolean) => {
+    const previousValue = strictModeEnabled;
+    setStrictModeEnabled(enabled);
+    updateEnforcementMutation.mutate(
+      { strictModeEnabled: enabled },
+      {
+        onError: () => {
+          // Rollback on error
+          setStrictModeEnabled(previousValue);
+        }
+      }
+    );
+  };
+
+  const handleUninstallProtectionChange = (enabled: boolean) => {
+    const previousValue = uninstallProtectionEnabled;
+    setUninstallProtectionEnabled(enabled);
+    updateEnforcementMutation.mutate(
+      { uninstallProtectionEnabled: enabled },
+      {
+        onError: () => {
+          // Rollback on error
+          setUninstallProtectionEnabled(previousValue);
+        }
+      }
+    );
+  };
+
+  const handleNotificationsSave = () => {
+    const updates = {
+      taskReminders: notificationSettings.taskReminders,
+      streakUpdates: notificationSettings.streakUpdates,
+      accountabilityAlerts: notificationSettings.accountabilityAlerts,
+    };
+    updateNotificationsMutation.mutate(updates);
   };
 
   const renderBackButton = () => (
@@ -117,9 +253,13 @@ export default function SettingsPage() {
                     />
                   </div>
                   
-                  <Button data-testid="button-save-profile">
+                  <Button 
+                    onClick={handleProfileSave}
+                    disabled={updateProfileMutation.isPending}
+                    data-testid="button-save-profile"
+                  >
                     <Save className="w-4 h-4 mr-2" />
-                    Save Changes
+                    {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
                   </Button>
                 </div>
               </CardContent>
@@ -195,7 +335,8 @@ export default function SettingsPage() {
                   </div>
                   <Switch
                     checked={strictModeEnabled}
-                    onCheckedChange={setStrictModeEnabled}
+                    onCheckedChange={handleStrictModeChange}
+                    disabled={updateEnforcementMutation.isPending}
                     data-testid="switch-strict-mode"
                   />
                 </div>
@@ -215,7 +356,8 @@ export default function SettingsPage() {
                   </div>
                   <Switch
                     checked={uninstallProtectionEnabled}
-                    onCheckedChange={setUninstallProtectionEnabled}
+                    onCheckedChange={handleUninstallProtectionChange}
+                    disabled={updateEnforcementMutation.isPending}
                     data-testid="switch-uninstall-protection"
                   />
                 </div>
@@ -390,9 +532,14 @@ export default function SettingsPage() {
 
                 <Separator className="my-6" />
 
-                <Button className="w-full" data-testid="button-save-notifications">
+                <Button 
+                  className="w-full" 
+                  onClick={handleNotificationsSave}
+                  disabled={updateNotificationsMutation.isPending}
+                  data-testid="button-save-notifications"
+                >
                   <Save className="w-4 h-4 mr-2" />
-                  Save Changes
+                  {updateNotificationsMutation.isPending ? "Saving..." : "Save Changes"}
                 </Button>
               </CardContent>
             </Card>
