@@ -28,7 +28,7 @@ export interface PdfViewResult {
 // Mobile PDF Handler Class
 export class MobilePdfHandler {
   private static instance: MobilePdfHandler;
-  private isNativePlatform: boolean;
+  public isNativePlatform: boolean;
 
   constructor() {
     this.isNativePlatform = Capacitor.isNativePlatform();
@@ -212,7 +212,8 @@ export class MobilePdfHandler {
   // 📋 Show mobile-native upload options
   private async showUploadOptions(allowCamera: boolean): Promise<'camera' | 'file'> {
     // This would be implemented with native action sheet
-    // For now, return 'file' as default
+    // For now, return 'file' as default (use allowCamera for future implementation)
+    console.log('📱 Upload options available:', allowCamera ? 'camera + file' : 'file only');
     return 'file';
   }
 
@@ -225,8 +226,9 @@ export class MobilePdfHandler {
 
   // 🗜️ Compress file for mobile data savings
   private async compressForMobile(data: string, quality: number): Promise<string> {
-    // Implement compression logic here
-    // For now, return original data
+    // Implement compression logic here based on quality parameter
+    // For now, return original data (quality will be used in future implementation)
+    console.log('📱 Compressing with quality:', quality);
     return data;
   }
 
@@ -256,12 +258,13 @@ export class MobilePdfHandler {
 
   // 🌐 Fallback for web PDF viewing
   private async fallbackWebView(pdfUrl: string): Promise<PdfViewResult> {
-    // Open in same tab instead of popup for mobile browsers
-    window.location.href = pdfUrl;
+    // Don't navigate same tab - this breaks the app flow!
+    // Return false so caller uses existing popup logic
+    console.log('🌐 Web browser detected - use standard popup approach instead for:', pdfUrl);
     
     return {
-      success: true,
-      localPath: pdfUrl
+      success: false,
+      error: 'Use standard popup approach for web browsers'
     };
   }
 

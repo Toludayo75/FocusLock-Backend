@@ -12,6 +12,7 @@ import { Task } from "@/types/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useMobileEnforcement } from "@/hooks/use-mobile-enforcement";
+import { useMobilePdf } from "@/hooks/use-mobile-pdf";
 import { Plus, Edit, Trash2, Clock, Smartphone, ClipboardCheck } from "lucide-react";
 import { format } from "date-fns";
 
@@ -21,6 +22,7 @@ export default function TasksPage() {
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
   const { toast } = useToast();
   const mobileEnforcement = useMobileEnforcement();
+  const mobilePdf = useMobilePdf();
 
   const { data: tasks = [] } = useQuery<Task[]>({
     queryKey: ["/api/tasks"],
@@ -53,10 +55,11 @@ export default function TasksPage() {
       return { task: taskData, pdfWindow };
     },
     onSuccess: async ({ task: startedTask, pdfWindow }: { task: Task, pdfWindow?: Window | null }) => {
-      // 1. Open PDF if it exists
+      // 1. Open PDF if it exists (SAFE WEB + MOBILE)
       let pdfOpened = false;
       if (startedTask.pdfFileUrl && pdfWindow) {
         try {
+          // 🌐 Standard popup approach (works for both web and mobile web)
           pdfWindow.location.href = startedTask.pdfFileUrl;
           console.log("📄 Opening PDF:", startedTask.pdfFileUrl);
           pdfOpened = true;
@@ -144,10 +147,25 @@ export default function TasksPage() {
     setTaskToDelete(taskId);
   };
 
-  const handleStartTask = (task: Task) => {
-    // Open PDF window synchronously to prevent popup blocking
+  // 📱 MOBILE-OPTIMIZED TASK START (Fixed)
+  const handleStartTask = async (task: Task) => {
+    // 🔒 SAFE: Always open popup first to prevent blocking, then decide how to handle
     const pdfWindow = task.pdfFileUrl ? window.open('about:blank', '_blank') : null;
+    
+    // Start the task mutation first to ensure it executes
     startTaskMutation.mutate({ taskId: task.id, taskData: task, pdfWindow });
+    
+    // 📱 For native mobile: Also try native PDF viewer (in addition to popup)
+    if (task.pdfFileUrl && mobilePdf.isNativePlatform) {
+      try {
+        // Try native viewer in parallel (doesn't replace popup, adds to it)
+        setTimeout(async () => {
+          await mobilePdf.viewPdf(task.pdfFileUrl!, `task-${task.id}.pdf`);
+        }, 100); // Small delay to ensure mutation executes first
+      } catch (error) {
+        console.error('📱 Native PDF viewing failed (popup still works):', error);
+      }
+    }
   };
 
   const confirmDelete = () => {

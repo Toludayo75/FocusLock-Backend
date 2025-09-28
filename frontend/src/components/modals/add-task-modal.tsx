@@ -18,8 +18,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { InsertTask } from "@/types/schema";
 import { X, Bell, Clock, Shield, Upload, Smartphone } from "lucide-react";
-// UNCOMMENT FOR MOBILE VERSION:
-// import { useMobileEnforcement } from "@/hooks/use-mobile-enforcement";
+import { useMobilePdf } from "@/hooks/use-mobile-pdf";
 
 const taskSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -58,8 +57,7 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
   const [selectedPdf, setSelectedPdf] = useState<File | null>(null);
   const [targetApps, setTargetApps] = useState<string[]>([]);
   
-  // UNCOMMENT FOR MOBILE VERSION:
-  // const mobileEnforcement = useMobileEnforcement();
+  const mobilePdf = useMobilePdf();
 
   const form = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
@@ -143,7 +141,8 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
     form.setValue('proofMethods', checked ? [...proofMethods, method] : proofMethods.filter(m => m !== method));
   };
 
-  const handlePdfChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // 📱 MOBILE-OPTIMIZED PDF UPLOAD
+  const handlePdfChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.type === 'application/pdf') {
       setSelectedPdf(file);
@@ -154,6 +153,24 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
         description: "Please select a PDF file",
         variant: "destructive",
       });
+    }
+  };
+
+  // 📱 MOBILE CAMERA/FILE UPLOAD
+  const handleMobilePdfUpload = async () => {
+    const result = await mobilePdf.uploadPdf({
+      allowCamera: true,
+      quality: 80,
+      offlineCache: true
+    });
+    
+    if (result.success && result.fileData) {
+      // Convert base64 to File object for compatibility
+      const blob = await fetch(`data:application/pdf;base64,${result.fileData}`).then(r => r.blob());
+      const file = new File([blob], result.fileName || 'mobile-upload.pdf', { type: 'application/pdf' });
+      
+      setSelectedPdf(file);
+      form.setValue('pdfFile', file);
     }
   };
 
@@ -364,12 +381,27 @@ export function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
                 id="pdf-input"
                 data-testid="input-pdf"
               />
-              <Button type="button" variant="outline" asChild>
-                <label htmlFor="pdf-input" className="cursor-pointer">
-                  <Upload className="w-4 h-4 mr-2" />
-                  Choose PDF
-                </label>
-              </Button>
+              <div className="flex gap-2">
+                <Button type="button" variant="outline" asChild>
+                  <label htmlFor="pdf-input" className="cursor-pointer">
+                    <Upload className="w-4 h-4 mr-2" />
+                    Choose PDF
+                  </label>
+                </Button>
+                
+                {/* 📱 MOBILE-NATIVE UPLOAD BUTTON (only show on native platforms) */}
+                {mobilePdf.isNativePlatform && (
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={handleMobilePdfUpload}
+                    disabled={mobilePdf.isUploading}
+                  >
+                    <Smartphone className="w-4 h-4 mr-2" />
+                    {mobilePdf.isUploading ? 'Uploading...' : 'Scan/Upload'}
+                  </Button>
+                )}
+              </div>
               {selectedPdf && (
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">{selectedPdf.name}</span>

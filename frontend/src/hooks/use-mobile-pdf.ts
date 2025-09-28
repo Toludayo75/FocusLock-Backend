@@ -6,6 +6,9 @@ import { mobilePdfHandler, PdfUploadResult, PdfViewResult, MobilePdfOptions } fr
 import { useToast } from '@/hooks/use-toast';
 
 export interface UseMobilePdfReturn {
+  // Platform detection
+  isNativePlatform: boolean;
+  
   // Upload functions
   uploadPdf: (options?: MobilePdfOptions) => Promise<PdfUploadResult>;
   isUploading: boolean;
@@ -29,6 +32,9 @@ export const useMobilePdf = (): UseMobilePdfReturn => {
   const [lastUploadResult, setLastUploadResult] = useState<PdfUploadResult | null>(null);
   const [lastViewResult, setLastViewResult] = useState<PdfViewResult | null>(null);
   const { toast } = useToast();
+  
+  // 🔍 Platform detection for proper feature gating
+  const isNativePlatform = mobilePdfHandler.isNativePlatform;
 
   // 📤 Upload PDF with mobile optimization
   const uploadPdf = useCallback(async (options?: MobilePdfOptions): Promise<PdfUploadResult> => {
@@ -144,6 +150,9 @@ export const useMobilePdf = (): UseMobilePdfReturn => {
   }, []);
 
   return {
+    // Platform detection
+    isNativePlatform,
+    
     // Upload functions
     uploadPdf,
     isUploading,
