@@ -1,3 +1,25 @@
+/*
+================================================================================
+🚫 DEVICE ADMIN PLUGIN - COMMENTED OUT AND DEPRECATED
+================================================================================
+
+This file has been DISABLED because it implements DevicePolicyManager which:
+- Requires Device Owner privileges (factory reset required)
+- Only works with enterprise device management
+- Not suitable for consumer applications
+- Creates terrible user experience
+
+✅ CURRENT IMPLEMENTATION: capacitor-plugin-focus-guard.ts
+- Uses FocusGuardPlugin with Accessibility Service
+- Standard Android permissions
+- Consumer-friendly setup
+- No factory reset required
+
+📝 DO NOT UNCOMMENT THIS FILE - IT IS KEPT FOR REFERENCE ONLY
+================================================================================
+*/
+
+/*
 // Custom Capacitor Plugin for Device Admin
 // COPY THIS TO: android/app/src/main/java/[your-package]/DeviceAdminPlugin.java
 // AND REGISTER IN MainActivity.java

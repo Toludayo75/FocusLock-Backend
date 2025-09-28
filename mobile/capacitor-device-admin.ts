@@ -1,7 +1,24 @@
-// ⚠️ DEPRECATED - DO NOT USE ⚠️
-// This file uses DevicePolicyManager which requires Device Owner privileges (factory reset)
-// Use capacitor-focus-guard.ts instead for consumer-safe enforcement
+/*
+================================================================================
+🚫 DEVICE ADMIN APPROACH - COMMENTED OUT AND DEPRECATED
+================================================================================
 
+This file has been DISABLED because it uses DevicePolicyManager which requires:
+- Device Owner privileges (factory reset required)
+- Enterprise-only deployment (not suitable for consumer apps)
+- Complex setup process that most users cannot complete
+
+✅ CURRENT IMPLEMENTATION: capacitor-focus-guard.ts
+- Uses Accessibility Service + Overlay + Usage Access permissions
+- Standard Android permissions that users can grant normally
+- No factory reset or enterprise enrollment required
+- Much better user experience for consumer apps
+
+📝 DO NOT UNCOMMENT THIS FILE - IT IS KEPT FOR REFERENCE ONLY
+================================================================================
+*/
+
+/*
 // Capacitor Device Admin Integration
 // UNCOMMENT AND USE WHEN CONVERTING TO ANDROID
 
@@ -189,3 +206,4 @@ export const useDeviceAdmin = () => {
     setAppUsageRestrictions
   };
 };
+*/

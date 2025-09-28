@@ -1,7 +1,24 @@
-// ⚠️ DEPRECATED - DO NOT USE ⚠️
-// This file uses DevicePolicyManager which requires Device Owner privileges (factory reset)
-// Use FocusGuardService.java instead for consumer-safe enforcement with Accessibility + Overlay
+/*
+================================================================================
+🚫 DEVICE ADMIN APPROACH - COMMENTED OUT AND DEPRECATED
+================================================================================
 
+This file has been DISABLED because it uses DevicePolicyManager which requires:
+- Device Owner privileges (factory reset required)
+- Complex enterprise setup not suitable for consumer apps
+- User must factory reset their device to grant permissions
+
+✅ CURRENT IMPLEMENTATION: FocusGuardService.java
+- Uses Accessibility Service (no factory reset needed)
+- Uses Overlay permissions (standard Android permission)
+- Uses Usage Access (standard permission in Settings)
+- Consumer-friendly setup process
+
+📝 DO NOT UNCOMMENT THIS FILE - IT IS KEPT FOR REFERENCE ONLY
+================================================================================
+*/
+
+/*
 // COPY THIS FILE TO: android/app/src/main/java/[your-package]/DeviceAdminReceiver.java
 // REPLACE [your-package] with your actual package name (e.g., com.focuslock.app)
 
@@ -202,3 +219,4 @@ public class DeviceAdminReceiver extends DeviceAdminReceiver {
         }
     }
 }
+*/
