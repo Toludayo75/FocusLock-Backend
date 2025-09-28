@@ -13,6 +13,9 @@ import { Separator } from "@/components/ui/separator";
 import { Header } from "@/components/layout/header";
 import { BottomNavigation } from "@/components/layout/bottom-navigation";
 import { ConfirmationModal } from "@/components/modals/confirmation-modal";
+import { PermissionOnboarding } from "@/components/onboarding/permission-onboarding";
+import { PermissionStatus } from "@/components/ui/permission-status";
+import { usePermissionManager } from "@/hooks/use-permission-manager";
 import { 
   User, 
   Bell, 
@@ -29,11 +32,12 @@ import {
   Smartphone
 } from "lucide-react";
 
-type SettingsView = 'main' | 'profile' | 'notifications' | 'focus' | 'integrations' | 'accountability';
+type SettingsView = 'main' | 'profile' | 'notifications' | 'focus' | 'integrations' | 'accountability' | 'permissions';
 
 export default function SettingsPage() {
   const { user, logoutMutation } = useAuth();
   const pushNotifications = usePushNotifications();
+  const permissionManager = usePermissionManager();
   const { toast } = useToast();
   const [currentView, setCurrentView] = useState<SettingsView>('main');
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -550,6 +554,76 @@ export default function SettingsPage() {
     );
   }
 
+  if (currentView === 'permissions') {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="flex-1 pb-20 max-w-4xl mx-auto px-4 py-6">
+          {renderBackButton()}
+          <h1 className="text-2xl font-bold mb-6">Mobile Permissions</h1>
+          
+          <div className="space-y-6">
+            {/* Current Permission Status */}
+            <PermissionStatus 
+              onSetupClick={() => {
+                // User clicked setup from status - do nothing as PermissionOnboarding handles everything
+              }}
+              className="mb-6"
+              data-testid="permission-status-main"
+            />
+
+            {/* Permission Setup Interface */}
+            <PermissionOnboarding
+              onComplete={() => {
+                toast({
+                  title: "Permissions Complete!",
+                  description: "FocusLock can now enforce focus sessions with app blocking."
+                });
+              }}
+              onSkip={() => {
+                toast({
+                  title: "Setup Skipped",
+                  description: "You can enable permissions anytime to unlock full enforcement features."
+                });
+              }}
+              showSkipButton={!permissionManager.coreEnforcementReady}
+            />
+            
+            {/* Additional Mobile Information */}
+            {!permissionManager.isNativePlatform && (
+              <Card className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+                <CardContent className="pt-6">
+                  <div className="flex items-start space-x-3">
+                    <Smartphone className="h-6 w-6 text-blue-600 flex-shrink-0 mt-1" />
+                    <div className="space-y-2">
+                      <h3 className="font-medium text-blue-900 dark:text-blue-100">
+                        Install FocusLock Mobile App
+                      </h3>
+                      <p className="text-sm text-blue-700 dark:text-blue-300">
+                        To access advanced enforcement features like app blocking and device locking, 
+                        install the FocusLock mobile app from your device's app store.
+                      </p>
+                      <div className="text-sm text-blue-600 dark:text-blue-400 space-y-1">
+                        <p><strong>Mobile features include:</strong></p>
+                        <ul className="list-disc list-inside ml-2">
+                          <li>Real app blocking during focus sessions</li>
+                          <li>Device-level enforcement</li>
+                          <li>Background monitoring</li>
+                          <li>Usage tracking and analytics</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </main>
+        <BottomNavigation currentTab="settings" />
+      </div>
+    );
+  }
+
   // Main settings view
   return (
     <div className="min-h-screen bg-background">
@@ -618,6 +692,42 @@ export default function SettingsPage() {
                   <div>
                     <h3 className="font-medium">Focus & Restrictions</h3>
                     <p className="text-sm text-muted-foreground">Strict mode and uninstall protection</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Mobile Permissions */}
+          <Card 
+            className="cursor-pointer hover:bg-muted/50 transition-colors"
+            onClick={() => setCurrentView('permissions')}
+            data-testid="settings-permissions"
+          >
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
+                    <Smartphone className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2">
+                      <h3 className="font-medium">Mobile Permissions</h3>
+                      {permissionManager.isNativePlatform && (
+                        <PermissionStatus 
+                          compact={true} 
+                          showActions={false}
+                          className="ml-2"
+                        />
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {permissionManager.isNativePlatform
+                        ? "Configure app blocking and enforcement permissions"
+                        : "Enable mobile features by installing the app"
+                      }
+                    </p>
                   </div>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
