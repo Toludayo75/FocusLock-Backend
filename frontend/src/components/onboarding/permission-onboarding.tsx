@@ -55,8 +55,8 @@ export function PermissionOnboarding({ onComplete, onSkip, showSkipButton = true
   // Calculate progress
   const totalRequired = Object.values(permissionManager.getAllPermissionDefinitions())
     .filter(p => p.required).length;
-  const grantedRequired = permissionManager.getMissingPermissions().length;
-  const progress = totalRequired > 0 ? ((totalRequired - grantedRequired) / totalRequired) * 100 : 0;
+  const missingRequired = permissionManager.getMissingPermissions().length;
+  const progress = totalRequired > 0 ? ((totalRequired - missingRequired) / totalRequired) * 100 : 0;
 
   // Handle permission setup
   const handleSetupPermission = async (permissionKey: string) => {
@@ -178,7 +178,7 @@ export function PermissionOnboarding({ onComplete, onSkip, showSkipButton = true
             {permissionManager.coreEnforcementReady ? (
               "🎉 Core enforcement is ready! FocusLock can now block distracting apps during focus sessions."
             ) : (
-              `✨ Great start! ${totalRequired - grantedRequired} of ${totalRequired} core permissions are ready.`
+              `✨ Great start! ${totalRequired - missingRequired} of ${totalRequired} core permissions are ready.`
             )}
           </AlertDescription>
         </Alert>
@@ -307,7 +307,7 @@ export function PermissionOnboarding({ onComplete, onSkip, showSkipButton = true
               <p className="text-sm font-medium">
                 {permissionManager.coreEnforcementReady ? 
                   "🎉 You're all set! FocusLock can now enforce focus sessions." :
-                  `${grantedRequired} permissions still needed for full enforcement`
+                  `${missingRequired} permissions still needed for full enforcement`
                 }
               </p>
               <p className="text-xs text-gray-600 dark:text-gray-400">
