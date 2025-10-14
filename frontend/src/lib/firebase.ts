@@ -162,13 +162,7 @@ class FirebaseNotificationService {
 
   private async registerTokenWithBackend(fcmToken: string) {
     try {
-      await apiRequest('/api/fcm/register', {
-        method: 'POST',
-        body: JSON.stringify({ fcmToken }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      await apiRequest('POST', '/api/fcm/register', { fcmToken });
       console.log('FCM token registered successfully');
     } catch (error) {
       console.error('Failed to register FCM token:', error);
@@ -178,9 +172,7 @@ class FirebaseNotificationService {
 
   async unregisterNotifications(): Promise<boolean> {
     try {
-      await apiRequest('/api/fcm/unregister', {
-        method: 'DELETE',
-      });
+      await apiRequest('DELETE', '/api/fcm/unregister');
       console.log('FCM token unregistered successfully');
       return true;
     } catch (error) {
