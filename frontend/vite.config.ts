@@ -2,6 +2,9 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 
+// Allow overriding backend URL via VITE_API_URL environment variable
+const backendUrl = process.env.VITE_API_URL || 'http://127.0.0.1:8001';;
+
 export default defineConfig({
   plugins: [react()],
   resolve: {
@@ -15,15 +18,15 @@ export default defineConfig({
     allowedHosts: [".replit.dev", ".repl.co", "localhost", "127.0.0.1"],
     proxy: {
       "/api": {
-        target: "http://localhost:8000",
+        target: backendUrl,
         changeOrigin: true,
       },
       "/uploads": {
-        target: "http://localhost:8000",
+        target: backendUrl,
         changeOrigin: true,
       },
       "/socket.io": {
-        target: "http://localhost:8000",
+        target: backendUrl,
         changeOrigin: true,
         ws: true,
       },
