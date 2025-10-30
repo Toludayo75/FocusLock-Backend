@@ -105,36 +105,29 @@ const io = new Server(server, {
 
 // Middleware - Secure CORS configuration
 app.use(cors({
-  origin: function(origin, callback) {
-    // Allow no origin only in development (mobile apps, curl)
-    if (!origin && isDevelopment) {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (Render health checks, Postman, mobile apps)
+    if (!origin) return callback(null, true);
+
+    // List of allowed frontend origins
+    const allowedOrigins = [
+      "http://localhost:5173", // Vite dev server
+      "https://focuslock-frontend.onrender.com" // Deployed frontend
+    ];
+
+    if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    
-    // Allow mobile client null origins in development
-    if (origin === 'null' && isDevelopment) {
-      return callback(null, true);
-    }
-    
-    if (origin && isOriginAllowed(origin, allowedOrigins)) {
-      return callback(null, true);
-    }
-    
-    // In production, reject unknown origins
-    if (!isDevelopment) {
-      console.warn(`HTTP CORS: Rejected origin: ${origin}`);
-      return callback(new Error('Not allowed by CORS'), false);
-    }
-    
-    // In development, be more permissive but log warnings
-    console.warn(`HTTP CORS: Allowing unregistered origin in development: ${origin}`);
-    return callback(null, true);
+
+    console.warn("HTTP CORS: Rejected origin:", origin);
+    return callback(new Error("Not allowed by CORS"));
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  optionsSuccessStatus: 200
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
