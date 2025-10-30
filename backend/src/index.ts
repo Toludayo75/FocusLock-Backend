@@ -315,14 +315,11 @@ class TaskScheduler {
 const taskScheduler = new TaskScheduler();
 
 // Start server
-const port = parseInt(process.env.BACKEND_PORT || '8000', 10);
-server.listen(port, '0.0.0.0', () => {
-  console.log(`Server running on port ${port}`);
-  
-  // Start background task scheduler
+const port = process.env.PORT || 8000;
+server.listen(port, "0.0.0.0", () => {
+  console.log(`✅ Server running on Render port ${port}`);
   taskScheduler.start();
 });
-
 // Handle WebSocket connections
 io.on('connection', (socket) => {
   console.log('Client connected to WebSocket:', socket.id);
