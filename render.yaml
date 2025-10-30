@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: focuslock-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm run build
+    startCommand: npm start
