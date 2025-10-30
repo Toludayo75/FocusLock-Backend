@@ -136,6 +136,10 @@ app.use('/uploads', express.static('uploads'));
 
 // Routes
 registerRoutes(app);
+// ✅ Root route for Render health check
+app.get("/", (req, res) => {
+  res.send("✅ FocusLock backend is running successfully.");
+});
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
