@@ -2,27 +2,32 @@
   "name": "focuslock-backend",
   "version": "1.0.0",
   "type": "module",
-"scripts": {
-  "prebuild": "npm install @types/node",
-  "dev": "tsx src/index.ts",
-  "build": "tsc",
-  "start": "node dist/index.js",
-  "db:push": "drizzle-kit push"
-},
-    "dependencies": {
-    "@types/node": "20.16.11",
+  "scripts": {
+    "prebuild": "npm install @types/node",
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "db:push": "drizzle-kit push"
+  },
+  "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
+    "@types/node": "20.16.11",
     "bcryptjs": "^3.0.2",
     "connect-pg-simple": "^10.0.0",
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",
     "drizzle-orm": "^0.39.3",
+    "escape-html": "^1.0.3",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
+    "firebase-admin": "^12.6.0",
+    "dotenv": "^16.4.5",
     "multer": "^1.4.5-lts.1",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "pg": "^8.16.3",
+    "socket.io": "^4.8.1",
+    "validator": "^13.11.0",
     "ws": "^8.18.0",
     "zod": "^3.24.2"
   },
@@ -35,6 +40,9 @@
     "@types/passport": "^1.0.16",
     "@types/passport-local": "^1.0.38",
     "@types/ws": "^8.5.12",
+    "@types/validator": "^13.11.9",
+    "@types/escape-html": "^1.0.3",
+    "@types/socket.io": "^3.0.2",
     "drizzle-kit": "^0.30.4",
     "tsx": "^4.19.1",
     "typescript": "5.6.3"
