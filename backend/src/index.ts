@@ -112,6 +112,7 @@ app.use(cors({
     // List of allowed frontend origins
     const allowedOrigins = [
       "http://localhost:5173", // Vite dev server
+      "https://localhost", //For android devices
       "https://focuslock-frontend.onrender.com" // Deployed frontend
     ];
 
