@@ -175,7 +175,11 @@ export function registerRoutes(app: Express): void {
     next();
   };
 
-  app.post("/api/tasks", requireAuth, upload.single('pdfFile'), async (req, res) => {
+     app.post(
+      "/api/tasks",
+      upload.single('pdfFile'), // 👈 multer FIRST
+      requireAuth,              // 👈 auth AFTER
+      async (req, res) => {
 
     try {
       // Parse form data - handle both JSON and multipart/form-data
