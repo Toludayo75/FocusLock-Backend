@@ -52,6 +52,7 @@ function isOriginAllowed(origin: string | undefined, allowedOrigins: string[]): 
 }
 
 const app = express();
+app.set("trust proxy", 1);
 const server = createServer(app);
 
 // Get CORS configuration
