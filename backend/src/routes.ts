@@ -79,6 +79,43 @@ export function registerRoutes(app: Express): void {
   // Setup authentication routes
   setupAuth(app);
 
+  // Development-only debug endpoint to inspect session and cookie state
+  // Use after logging in to compare what the browser sent vs what the server finds
+  app.get('/api/debug/session', async (req, res) => {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(404).json({ message: 'Not available in production' });
+    }
+
+    const sessionId = req.sessionID || null;
+    const isAuthed = typeof req.isAuthenticated === 'function' ? req.isAuthenticated() : false;
+
+    const result: any = {
+      isAuthenticated: !!isAuthed,
+      sessionId,
+      cookies: req.cookies || null,
+      headerCookie: req.headers?.cookie || null,
+      userPresent: !!req.user,
+    };
+
+    try {
+      if (sessionId && storage.sessionStore && typeof storage.sessionStore.get === 'function') {
+        storage.sessionStore.get(sessionId, (err: any, sess: any) => {
+          if (err) {
+            result.storeError = String(err);
+            return res.json(result);
+          }
+          result.serverSession = sess || null;
+          return res.json(result);
+        });
+      } else {
+        return res.json(result);
+      }
+    } catch (e) {
+      result.fetchError = String(e);
+      return res.json(result);
+    }
+  });
+
   // Task routes
   // Get active tasks for current user (HTTP polling fallback)
   app.get("/api/tasks/active", async (req, res) => {
@@ -170,12 +207,27 @@ export function registerRoutes(app: Express): void {
   // Auth middleware to prevent unauthorized file uploads
   const requireAuth = (req: any, res: any, next: any) => {
     if (!req.isAuthenticated()) {
+      // Dev-only debug logging to help diagnose missing session/cookie problems
+      if (process.env.NODE_ENV !== 'production') {
+        try {
+          console.warn('🛑 Unauthorized request blocked by requireAuth:', {
+            method: req.method,
+            url: req.originalUrl,
+            ip: req.ip,
+            cookies: req.cookies || null,
+            headerCookie: req.headers?.cookie || null,
+            userPresent: !!req.user,
+          });
+        } catch (e) {
+          console.warn('🛑 requireAuth debug log failed', e);
+        }
+      }
       return res.status(401).json({ message: "Unauthorized" });
     }
     next();
   };
 
-     app.post(
+    app.post(
       "/api/tasks",
       upload.single('pdfFile'), // 👈 multer FIRST
       requireAuth,              // 👈 auth AFTER
