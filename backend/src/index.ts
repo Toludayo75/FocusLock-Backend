@@ -69,36 +69,24 @@ if (isDevelopment) {
 const io = new Server(server, {
   cors: {
     origin: function(origin, callback) {
-      // Allow no origin only in development (mobile apps, curl)
-      if (!origin && isDevelopment) {
-        return callback(null, true);
-      }
-      
-      // Allow mobile client null origins in development
-      if (origin === 'null' && isDevelopment) {
-        return callback(null, true);
-      }
-      
-      if (origin && isOriginAllowed(origin, allowedOrigins)) {
-        return callback(null, true);
-      }
-      
-      // In production, reject unknown origins
-      if (!isDevelopment) {
-        console.warn(`WebSocket CORS: Rejected origin: ${origin}`);
-        return callback(new Error('Not allowed by CORS'), false);
-      }
-      
-      // In development, be more permissive but log warnings
-      console.warn(`WebSocket CORS: Allowing unregistered origin in development: ${origin}`);
-      return callback(null, true);
+      // Allow requests with no origin (health checks, curl, server-to-server)
+      if (!origin) return callback(null, true);
+
+      // Allow null origin only in development (mobile apps, file://)
+      if (origin === 'null' && isDevelopment) return callback(null, true);
+
+      // Allow explicitly whitelisted origins
+      if (origin && isOriginAllowed(origin, allowedOrigins)) return callback(null, true);
+
+      // Reject unknown browser origins in production
+      console.warn(`WebSocket CORS: Rejected origin: ${origin}`);
+      return callback(new Error('Not allowed by CORS'), false);
     },
     methods: ["GET", "POST"],
     credentials: true
   },
-  // Mobile-optimized settings for reliability
-  pingTimeout: 60000, // 1 minute
-  pingInterval: 25000, // 25 seconds
+  pingTimeout: 60000,
+  pingInterval: 25000,
   transports: ['websocket', 'polling'],
   allowEIO3: true
 });
@@ -106,35 +94,25 @@ const io = new Server(server, {
 // Middleware - Secure CORS configuration
 app.use(cors({
   origin: function(origin, callback) {
-    // Allow no origin only in development (mobile apps, curl)
-    if (!origin && isDevelopment) {
-      return callback(null, true);
-    }
-    
-    // Allow mobile client null origins in development
-    if (origin === 'null' && isDevelopment) {
-      return callback(null, true);
-    }
-    
-    if (origin && isOriginAllowed(origin, allowedOrigins)) {
-      return callback(null, true);
-    }
-    
-    // In production, reject unknown origins
-    if (!isDevelopment) {
-      console.warn(`HTTP CORS: Rejected origin: ${origin}`);
-      return callback(new Error('Not allowed by CORS'), false);
-    }
-    
-    // In development, be more permissive but log warnings
-    console.warn(`HTTP CORS: Allowing unregistered origin in development: ${origin}`);
-    return callback(null, true);
+    // Allow requests with no origin (health checks, curl, server-to-server)
+    if (!origin) return callback(null, true);
+
+    // Allow null origin only in development (mobile apps, file://)
+    if (origin === 'null' && isDevelopment) return callback(null, true);
+
+    // Allow explicitly whitelisted origins
+    if (origin && isOriginAllowed(origin, allowedOrigins)) return callback(null, true);
+
+    // Reject unknown browser origins in production
+    console.warn(`HTTP CORS: Rejected origin: ${origin}`);
+    return callback(new Error('Not allowed by CORS'), false);
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization','X-Requested-With'],
+  optionsSuccessStatus: 200
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
