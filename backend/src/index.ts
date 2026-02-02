@@ -113,6 +113,20 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
+app.options('*', cors({
+  origin: function(origin, callback) {
+    if (!origin) return callback(null, true);
+    if (origin === 'null' && isDevelopment) return callback(null, true);
+    if (origin && isOriginAllowed(origin, allowedOrigins)) return callback(null, true);
+    if (!isDevelopment) return callback(new Error('Not allowed by CORS'), false);
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization','X-Requested-With'],
+  optionsSuccessStatus: 204
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
