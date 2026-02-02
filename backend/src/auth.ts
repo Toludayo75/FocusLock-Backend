@@ -41,14 +41,21 @@ export function setupAuth(app: Express): void {
   }
   
   const sessionSettings: session.SessionOptions = {
+    name: "focuslock.sid", // ✅ ADD THIS
     secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     store: storage.sessionStore,
+    proxy: true,
+    // Cookie settings: enable cross-site cookies in production so the
+    // frontend (on a different origin) can send the session cookie when
+    // using credentials. Browsers require SameSite='none' together with
+    // Secure=true for cross-site cookies.
     cookie: {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
     },
   };
 
@@ -190,7 +197,10 @@ export function setupAuth(app: Express): void {
       if (err) return next(err);
       req.session.destroy((err) => {
         if (err) return next(err);
-        res.clearCookie("connect.sid");
+        res.clearCookie("focuslock.sid", {
+          secure: true,
+          sameSite: "none",
+          });
         res.status(200).json({ message: "Logged out successfully" });
       });
     });
