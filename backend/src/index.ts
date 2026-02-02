@@ -1,12 +1,13 @@
 import dotenv from "dotenv";
 dotenv.config({ path: "../.env" });
-
 import express from "express";
 import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { registerRoutes } from "./routes.js";
 import { storage } from "./storage.js";
+import cookieParser from "cookie-parser";
+
 
 // Import Firebase service AFTER environment variables are loaded
 import { firebaseService } from "./firebase-service.js";
@@ -63,8 +64,6 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 const isDevelopment = process.env.NODE_ENV !== 'production';
 if (isDevelopment) {
   allowedOrigins.push('http://localhost:5000', 'http://localhost:3000');
-  // Add Replit development domains
-  allowedOrigins.push('https://*.replit.dev', 'https://*.repl.co');
 }
 
 const io = new Server(server, {
@@ -106,42 +105,46 @@ const io = new Server(server, {
 
 // Middleware - Secure CORS configuration
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (Render health checks, Postman, mobile apps)
-    if (!origin) return callback(null, true);
-
-    // List of allowed frontend origins
-    const allowedOrigins = [
-      "http://localhost:5173", // Vite dev server
-      "https://localhost", //For android devices
-      "https://focuslock-frontend.onrender.com" // Deployed frontend
-    ];
-
-    if (allowedOrigins.includes(origin)) {
+  origin: function(origin, callback) {
+    // Allow no origin only in development (mobile apps, curl)
+    if (!origin && isDevelopment) {
       return callback(null, true);
     }
-
-    console.warn("HTTP CORS: Rejected origin:", origin);
-    return callback(new Error("Not allowed by CORS"));
+    
+    // Allow mobile client null origins in development
+    if (origin === 'null' && isDevelopment) {
+      return callback(null, true);
+    }
+    
+    if (origin && isOriginAllowed(origin, allowedOrigins)) {
+      return callback(null, true);
+    }
+    
+    // In production, reject unknown origins
+    if (!isDevelopment) {
+      console.warn(`HTTP CORS: Rejected origin: ${origin}`);
+      return callback(new Error('Not allowed by CORS'), false);
+    }
+    
+    // In development, be more permissive but log warnings
+    console.warn(`HTTP CORS: Allowing unregistered origin in development: ${origin}`);
+    return callback(null, true);
   },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  optionsSuccessStatus: 200
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
 }));
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 // Serve static files from uploads directory
 app.use('/uploads', express.static('uploads'));
 
 // Routes
+
 registerRoutes(app);
-// ✅ Root route for Render health check
-app.get("/", (req, res) => {
-  res.send("✅ FocusLock backend is running successfully.");
-});
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -317,11 +320,10 @@ class TaskScheduler {
 const taskScheduler = new TaskScheduler();
 
 // Start server
-const port = Number(process.env.PORT) || 8000;
-
-server.listen(port, "0.0.0.0", () => {
-  console.log(`✅ Server running on Render port ${port}`);
-
+const port = parseInt(process.env.BACKEND_PORT || '8000', 10);
+server.listen(port, '0.0.0.0', () => {
+  console.log(`Server running on port ${port}`);
+  
   // Start background task scheduler
   taskScheduler.start();
 });
